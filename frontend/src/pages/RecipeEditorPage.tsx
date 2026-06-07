@@ -1,16 +1,274 @@
-import { Link, useParams } from 'react-router-dom'
+import { useMemo } from 'react'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Plus, Trash2 } from 'lucide-react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { z } from 'zod'
+
+import { MediaManager } from '@/components/MediaManager'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
+import { Textarea } from '@/components/ui/textarea'
+import { api, type Recipe, type RecipeCreate, type RecipeUpdate } from '@/lib/api'
+
+const numString = z.string().regex(/^\d*$/, 'Numbers only')
+const schema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string(),
+  servings: numString,
+  prep_time_min: numString,
+  cook_time_min: numString,
+  tags: z.string(),
+  ingredients: z.array(
+    z.object({
+      name: z.string(),
+      quantity: z.string(),
+      unit: z.string(),
+    }),
+  ),
+  steps: z.array(z.object({ instruction: z.string() })),
+})
+type FormValues = z.infer<typeof schema>
+
+const EMPTY: FormValues = {
+  title: '',
+  description: '',
+  servings: '',
+  prep_time_min: '',
+  cook_time_min: '',
+  tags: '',
+  ingredients: [{ name: '', quantity: '', unit: '' }],
+  steps: [{ instruction: '' }],
+}
+
+function toForm(r: Recipe): FormValues {
+  return {
+    title: r.title,
+    description: r.description ?? '',
+    servings: r.servings != null ? String(r.servings) : '',
+    prep_time_min: r.prep_time_min != null ? String(r.prep_time_min) : '',
+    cook_time_min: r.cook_time_min != null ? String(r.cook_time_min) : '',
+    tags: r.tags.map((t) => t.name).join(', '),
+    ingredients: r.ingredients.length
+      ? r.ingredients.map((i) => ({ name: i.name, quantity: i.quantity ?? '', unit: i.unit ?? '' }))
+      : [{ name: '', quantity: '', unit: '' }],
+    steps: r.steps.length ? r.steps.map((s) => ({ instruction: s.instruction })) : [{ instruction: '' }],
+  }
+}
+
+function toPayload(v: FormValues): RecipeCreate {
+  const num = (s: string) => (s.trim() === '' ? null : Number(s))
+  return {
+    title: v.title.trim(),
+    description: v.description.trim() || null,
+    servings: num(v.servings),
+    prep_time_min: num(v.prep_time_min),
+    cook_time_min: num(v.cook_time_min),
+    tags: v.tags
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean),
+    ingredients: v.ingredients
+      .filter((i) => i.name.trim())
+      .map((i) => ({
+        name: i.name.trim(),
+        quantity: i.quantity.trim() || null,
+        unit: i.unit.trim() || null,
+      })),
+    steps: v.steps
+      .filter((s) => s.instruction.trim())
+      .map((s) => ({ instruction: s.instruction.trim() })),
+  }
+}
 
 export function RecipeEditorPage() {
   const { id } = useParams()
+  const isEdit = Boolean(id)
+  const recipeId = Number(id)
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+
+  const { data: recipe, isLoading } = useQuery({
+    queryKey: ['recipe', recipeId],
+    queryFn: () => api.getRecipe(recipeId),
+    enabled: isEdit && Number.isFinite(recipeId),
+  })
+
+  const values = useMemo(() => (recipe ? toForm(recipe) : EMPTY), [recipe])
+  const form = useForm<FormValues>({ resolver: zodResolver(schema), values })
+  const ingredients = useFieldArray({ control: form.control, name: 'ingredients' })
+  const steps = useFieldArray({ control: form.control, name: 'steps' })
+
+  const save = useMutation({
+    mutationFn: (payload: RecipeCreate | RecipeUpdate) =>
+      isEdit ? api.updateRecipe(recipeId, payload) : api.createRecipe(payload as RecipeCreate),
+    onSuccess: (saved) => {
+      qc.invalidateQueries({ queryKey: ['recipes'] })
+      qc.invalidateQueries({ queryKey: ['recipe', saved.id] })
+      // After creating, land on the editor so photos/videos can be added.
+      navigate(isEdit ? `/recipes/${saved.id}` : `/recipes/${saved.id}/edit`)
+    },
+  })
+
+  if (isEdit && isLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Spinner className="size-8" />
+      </div>
+    )
+  }
+
+  const onSubmit = form.handleSubmit((v) => save.mutate(toPayload(v)))
+  const { errors } = form.formState
+
   return (
-    <div className="space-y-4">
-      <Link to="/" className="text-sm text-muted-foreground underline">
-        ← All recipes
-      </Link>
-      <h1 className="font-serif text-3xl font-bold">{id ? 'Edit recipe' : 'New recipe'}</h1>
-      <p className="text-muted-foreground">
-        The recipe editor (with photo &amp; video upload) arrives in the next iteration.
-      </p>
+    <div className="mx-auto max-w-3xl space-y-8">
+      <div>
+        <Link
+          to={isEdit ? `/recipes/${recipeId}` : '/'}
+          className="text-sm text-muted-foreground underline"
+        >
+          ← Back
+        </Link>
+        <h1 className="mt-2 font-serif text-3xl font-bold">
+          {isEdit ? 'Edit recipe' : 'New recipe'}
+        </h1>
+      </div>
+
+      <form onSubmit={onSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="title">Title</Label>
+          <Input id="title" {...form.register('title')} placeholder="Grandma's tomato pasta" />
+          {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            {...form.register('description')}
+            placeholder="A few words about this dish…"
+          />
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-2">
+            <Label htmlFor="servings">Servings</Label>
+            <Input id="servings" inputMode="numeric" {...form.register('servings')} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="prep">Prep (min)</Label>
+            <Input id="prep" inputMode="numeric" {...form.register('prep_time_min')} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cook">Cook (min)</Label>
+            <Input id="cook" inputMode="numeric" {...form.register('cook_time_min')} />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tags">Tags</Label>
+          <Input id="tags" {...form.register('tags')} placeholder="dinner, vegetarian, quick" />
+          <p className="text-xs text-muted-foreground">Comma-separated.</p>
+        </div>
+
+        <div className="space-y-3">
+          <Label>Ingredients</Label>
+          <ul className="space-y-2">
+            {ingredients.fields.map((f, idx) => (
+              <li key={f.id} className="flex gap-2">
+                <Input
+                  placeholder="Qty"
+                  className="w-20"
+                  {...form.register(`ingredients.${idx}.quantity`)}
+                />
+                <Input
+                  placeholder="Unit"
+                  className="w-24"
+                  {...form.register(`ingredients.${idx}.unit`)}
+                />
+                <Input placeholder="Ingredient" {...form.register(`ingredients.${idx}.name`)} />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Remove ingredient"
+                  onClick={() => ingredients.remove(idx)}
+                >
+                  <Trash2 />
+                </Button>
+              </li>
+            ))}
+          </ul>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => ingredients.append({ name: '', quantity: '', unit: '' })}
+          >
+            <Plus /> Add ingredient
+          </Button>
+        </div>
+
+        <div className="space-y-3">
+          <Label>Steps</Label>
+          <ol className="space-y-2">
+            {steps.fields.map((f, idx) => (
+              <li key={f.id} className="flex gap-2">
+                <span className="mt-2.5 w-5 shrink-0 text-right text-sm text-muted-foreground">
+                  {idx + 1}.
+                </span>
+                <Textarea
+                  rows={2}
+                  placeholder="Describe this step…"
+                  {...form.register(`steps.${idx}.instruction`)}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Remove step"
+                  onClick={() => steps.remove(idx)}
+                >
+                  <Trash2 />
+                </Button>
+              </li>
+            ))}
+          </ol>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => steps.append({ instruction: '' })}
+          >
+            <Plus /> Add step
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={save.isPending}>
+            {save.isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create recipe'}
+          </Button>
+          {save.isError && (
+            <p className="text-sm text-destructive">{(save.error as Error).message}</p>
+          )}
+        </div>
+      </form>
+
+      {isEdit && recipe ? (
+        <section className="space-y-3 border-t pt-6">
+          <h2 className="font-serif text-xl font-semibold">Photos &amp; video</h2>
+          <MediaManager recipe={recipe} />
+        </section>
+      ) : (
+        <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+          Save the recipe first, then you can add photos and videos.
+        </p>
+      )}
     </div>
   )
 }

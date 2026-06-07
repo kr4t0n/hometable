@@ -153,11 +153,24 @@ export const api = {
 }
 
 // Upload bytes straight to the object store using the presigned PUT URL.
-export async function uploadToPresignedUrl(url: string, file: File): Promise<void> {
-  const res = await fetch(url, {
-    method: 'PUT',
-    body: file,
-    headers: { 'Content-Type': file.type },
+// Uses XHR so we can report upload progress.
+export function uploadFile(
+  url: string,
+  file: File,
+  onProgress?: (percent: number) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('PUT', url)
+    xhr.setRequestHeader('Content-Type', file.type)
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100))
+    }
+    xhr.onload = () =>
+      xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(new Error(`Upload failed (${xhr.status})`))
+    xhr.onerror = () => reject(new Error('Upload failed'))
+    xhr.send(file)
   })
-  if (!res.ok) throw new Error(`Upload failed (${res.status})`)
 }
