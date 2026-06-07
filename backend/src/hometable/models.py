@@ -36,10 +36,9 @@ class Recipe(Base):
     servings: Mapped[int | None] = mapped_column(default=None)
     prep_time_min: Mapped[int | None] = mapped_column(default=None)
     cook_time_min: Mapped[int | None] = mapped_column(default=None)
-    cover_media_id: Mapped[int | None] = mapped_column(
-        ForeignKey("media.id", use_alter=True, name="fk_recipe_cover_media", ondelete="SET NULL"),
-        default=None,
-    )
+    # App-managed reference to the chosen cover media row. Intentionally NOT a DB
+    # foreign key, to avoid a recipes<->media cycle; integrity is enforced in the API.
+    cover_media_id: Mapped[int | None] = mapped_column(default=None)
     # Reserved for future multi-user / auth; nullable so single-user works today.
     user_id: Mapped[int | None] = mapped_column(default=None, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

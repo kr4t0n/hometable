@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: e31b140c3687
+Revision ID: 4d7703adcd70
 Revises: 
-Create Date: 2026-06-07 16:06:26.695007
+Create Date: 2026-06-07 16:10:09.334553
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e31b140c3687'
+revision: str = '4d7703adcd70'
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -32,7 +32,6 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['cover_media_id'], ['media.id'], name='fk_recipe_cover_media', ondelete='SET NULL', use_alter=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_recipes_user_id'), 'recipes', ['user_id'], unique=False)
