@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "hometable.fullname" . }}-config
+  labels:
+    {{- include "hometable.labels" . | nindent 4 }}
+data:
+  ENV: {{ .Values.backend.env | quote }}
+  S3_ENDPOINT_URL: {{ required "s3.endpoint is required" .Values.s3.endpoint | quote }}
+  S3_PUBLIC_ENDPOINT: {{ required "s3.publicEndpoint is required (must be browser-reachable)" .Values.s3.publicEndpoint | quote }}
+  S3_BUCKET: {{ .Values.s3.bucket | quote }}
+  S3_REGION: {{ .Values.s3.region | quote }}
+  MAX_UPLOAD_MB: {{ .Values.backend.maxUploadMb | quote }}
+  MEDIA_PRESIGN_EXPIRY: {{ .Values.backend.mediaPresignExpiry | quote }}
+  CORS_ORIGINS: {{ .Values.backend.corsOrigins | quote }}

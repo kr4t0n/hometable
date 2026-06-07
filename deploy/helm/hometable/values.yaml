@@ -1,0 +1,61 @@
+# hometable Helm chart — deploys the app only; Postgres and MinIO are EXTERNAL.
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  backend:
+    repository: hometable-backend
+    tag: "" # defaults to .Chart.AppVersion
+  frontend:
+    repository: hometable-frontend
+    tag: ""
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+backend:
+  replicas: 2
+  port: 8000
+  env: production
+  maxUploadMb: 512
+  mediaPresignExpiry: 3600
+  corsOrigins: "" # usually unnecessary — the frontend proxies /api same-origin
+  resources: {}
+
+frontend:
+  replicas: 2
+  port: 80
+  resources: {}
+
+# ── External Postgres ────────────────────────────────────────────────
+# Provide the SQLAlchemy URL via an existing Secret (recommended) or inline.
+postgres:
+  existingSecret: "" # name of a Secret holding the DATABASE_URL
+  existingSecretKey: DATABASE_URL
+  url: "" # used only if existingSecret is empty
+  # e.g. postgresql+psycopg://hometable:password@postgres.db.svc:5432/hometable
+
+# ── External S3 / MinIO ──────────────────────────────────────────────
+s3:
+  endpoint: "" # in-cluster, server-side — e.g. http://minio.minio.svc:9000
+  publicEndpoint: "" # browser-reachable, used to SIGN presigned URLs — e.g. https://minio.example.com
+  bucket: hometable-media
+  region: us-east-1
+  existingSecret: "" # Secret with keys S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY
+  accessKeyId: "" # used only if existingSecret is empty
+  secretAccessKey: ""
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+  host: hometable.example.com
+  tls:
+    enabled: false
+    secretName: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+podAnnotations: {}

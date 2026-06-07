@@ -1,0 +1,17 @@
+hometable has been deployed.
+
+{{ if .Values.ingress.enabled -}}
+URL:  http{{ if .Values.ingress.tls.enabled }}s{{ end }}://{{ .Values.ingress.host }}
+{{- else -}}
+Ingress is disabled. Reach the app via the frontend Service:
+  kubectl port-forward svc/{{ include "hometable.fullname" . }}-frontend 8080:{{ .Values.frontend.port }}
+  open http://localhost:8080
+{{- end }}
+
+Reminder — presigned media URLs are signed against:
+  S3_PUBLIC_ENDPOINT = {{ .Values.s3.publicEndpoint | default "(unset!)" }}
+This MUST be reachable by users' browsers (your MinIO ingress/route), NOT the in-cluster
+service DNS used for server-side calls (S3_ENDPOINT_URL).
+
+Check rollout:
+  kubectl get pods -l app.kubernetes.io/instance={{ .Release.Name }}

@@ -1,0 +1,37 @@
+# Example production values. Copy and edit, then:
+#   helm upgrade --install hometable ./deploy/helm/hometable -f my-values.yaml
+#
+# This example wires the chart to EXTERNAL Postgres + MinIO using existing Secrets,
+# which is the recommended pattern (no credentials in values/git).
+
+image:
+  backend:
+    repository: registry.example.com/hometable-backend
+    tag: "0.1.0"
+  frontend:
+    repository: registry.example.com/hometable-frontend
+    tag: "0.1.0"
+
+postgres:
+  # A Secret you already manage, containing key DATABASE_URL:
+  #   postgresql+psycopg://hometable:<pw>@postgres.db.svc:5432/hometable
+  existingSecret: hometable-postgres
+  existingSecretKey: DATABASE_URL
+
+s3:
+  endpoint: http://minio.minio.svc:9000        # in-cluster (server-side)
+  publicEndpoint: https://minio.example.com     # browser-reachable (presign)
+  bucket: hometable-media
+  region: us-east-1
+  # A Secret with keys S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY:
+  existingSecret: hometable-minio
+
+ingress:
+  enabled: true
+  className: nginx
+  host: hometable.example.com
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  tls:
+    enabled: true
+    secretName: hometable-tls

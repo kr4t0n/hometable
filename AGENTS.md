@@ -78,8 +78,8 @@ object store handle range requests (video seeking) natively.
 4. Frontend foundation (Vite + Tailwind + shadcn/ui + design tokens) ✅
 5. Recipe features UI (list/detail/editor + media manager with presigned upload) ✅
 6. Search, tags & categories ✅
-7. Dev/test packaging (Dockerfiles + full Compose) — not started
-8. Helm chart (k8s, external Postgres + MinIO) — not started
+7. Dev/test packaging (Dockerfiles + full Compose) ✅
+8. Helm chart (k8s, external Postgres + MinIO) ✅
 
 ## Planned / deferred (v2)
 

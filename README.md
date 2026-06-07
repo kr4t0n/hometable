@@ -105,10 +105,22 @@ hometable/
 ## Deployment
 
 - **Dev / CI** → Docker Compose (this repo's `docker-compose.yml`).
-- **Production** → the Helm chart under `deploy/helm/hometable/`, which deploys only the app and
-  connects to your **existing** Postgres and MinIO via values + existing Secrets. See that chart's
-  values for the wiring. Note: presigned URLs are signed against `S3_PUBLIC_ENDPOINT`, which must
-  be the externally reachable MinIO address.
+- **Production** → the Helm chart under `deploy/helm/hometable/`, which deploys **only the app**
+  (backend + frontend) and connects to your **existing** Postgres and MinIO via values + existing
+  Secrets. Alembic migrations run as a `pre-install`/`pre-upgrade` **Job**.
+
+```bash
+# build & push images to your registry first, then:
+helm upgrade --install hometable ./deploy/helm/hometable -f my-values.yaml
+```
+
+See `deploy/helm/hometable/values-prod-example.yaml` for a complete example (external Postgres +
+MinIO via existing Secrets, ingress + TLS). The chart needs from you: container registry, ingress
+class + hostname, and the Secret names/keys for Postgres + MinIO credentials.
+
+> **Gotcha:** presigned media URLs are signed against `s3.publicEndpoint`, which must be the
+> **browser-reachable** MinIO address (your MinIO ingress), *not* the in-cluster service DNS used
+> for server-side calls (`s3.endpoint`).
 
 ## License
 
