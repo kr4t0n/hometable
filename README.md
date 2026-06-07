@@ -29,28 +29,38 @@ Postgres database and S3-compatible object store, not a third-party service.
 - [uv](https://docs.astral.sh/uv/) (Python tooling)
 - Node.js 22+ and npm
 
-## Quick start (development)
+## Run the whole app with Docker (simplest)
 
 ```bash
-# 1. Start dependencies (Postgres + MinIO) and create the media bucket
-cp .env.example .env
-docker compose up -d
-
-# 2. Backend (FastAPI) — http://localhost:8000  (docs at /docs)
-cd backend
-uv sync --dev
-uv run alembic upgrade head
-uv run uvicorn hometable.main:app --reload
-
-# 3. Frontend (Vite dev server) — http://localhost:5173
-cd ../frontend
-npm install
-npm run dev
+cp .env.example .env            # adjust S3_PUBLIC_ENDPOINT for remote access (see below)
+docker compose up -d --build    # builds + runs app, Postgres, MinIO; applies migrations
 ```
 
-The frontend dev server proxies `/api` to the backend, so no CORS juggling locally.
+Open **http://localhost:5173**. The frontend container serves the SPA and proxies `/api` to the
+backend; the backend applies migrations on startup. MinIO console: http://localhost:9001
+(`minioadmin` / `minioadmin`).
 
-MinIO console is at http://localhost:9001 (user/pass `minioadmin` / `minioadmin`).
+## Local dev (hot reload)
+
+```bash
+cp .env.example .env
+docker compose up -d db storage          # just the dependencies
+
+# Backend — http://localhost:8000 (docs at /docs)
+cd backend && uv sync --dev && uv run alembic upgrade head && uv run uvicorn hometable.main:app --reload
+
+# Frontend — http://localhost:5173 (proxies /api to the backend)
+cd ../frontend && npm install && npm run dev
+```
+
+### Accessing from another machine (remote dev)
+
+Media is served via **presigned URLs** the browser fetches directly from MinIO, so the signing
+endpoint must be reachable by your browser. If you open the app from another device (LAN IP,
+Tailscale, …), set `S3_PUBLIC_ENDPOINT` in `.env` to that reachable address — e.g.
+`S3_PUBLIC_ENDPOINT=http://100.90.0.0:9000` — and restart the backend. Otherwise photos/videos
+won't load (they'd point at `localhost`). The backend still reaches MinIO internally via
+`S3_ENDPOINT_URL`.
 
 ## Build, test, lint
 
