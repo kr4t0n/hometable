@@ -72,14 +72,14 @@ object store handle range requests (video seeking) natively.
 
 ## Build phases
 
-1. Repo & tooling scaffold ✅ (in progress)
-2. Backend foundation (FastAPI, Postgres, models, Alembic, S3 storage, health)
-3. Recipe CRUD API + tests
-4. Frontend foundation (Vite + Tailwind + shadcn/ui + design tokens)
-5. Recipe features UI (list/detail/editor + media manager with presigned upload)
-6. Search, tags & categories
-7. Dev/test packaging (Dockerfiles + full Compose) — later
-8. Helm chart (k8s, external Postgres + MinIO) — later
+1. Repo & tooling scaffold ✅
+2. Backend foundation (FastAPI, Postgres, models, Alembic, S3 storage, health) ✅
+3. Recipe CRUD API + tests ✅
+4. Frontend foundation (Vite + Tailwind + shadcn/ui + design tokens) ✅
+5. Recipe features UI (list/detail/editor + media manager with presigned upload) ✅
+6. Search, tags & categories ✅
+7. Dev/test packaging (Dockerfiles + full Compose) — not started
+8. Helm chart (k8s, external Postgres + MinIO) — not started
 
 ## Planned / deferred (v2)
 

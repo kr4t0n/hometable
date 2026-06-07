@@ -102,6 +102,18 @@ export function RecipeEditorPage() {
   const form = useForm<FormValues>({ resolver: zodResolver(schema), values })
   const ingredients = useFieldArray({ control: form.control, name: 'ingredients' })
   const steps = useFieldArray({ control: form.control, name: 'steps' })
+  const tagsQuery = useQuery({ queryKey: ['tags'], queryFn: () => api.listTags() })
+
+  const addTag = (name: string) => {
+    const list = form
+      .getValues('tags')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (!list.includes(name)) {
+      form.setValue('tags', [...list, name].join(', '), { shouldDirty: true })
+    }
+  }
 
   const save = useMutation({
     mutationFn: (payload: RecipeCreate | RecipeUpdate) =>
@@ -174,6 +186,20 @@ export function RecipeEditorPage() {
           <Label htmlFor="tags">Tags</Label>
           <Input id="tags" {...form.register('tags')} placeholder="dinner, vegetarian, quick" />
           <p className="text-xs text-muted-foreground">Comma-separated.</p>
+          {tagsQuery.data && tagsQuery.data.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {tagsQuery.data.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => addTag(t.name)}
+                  className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-secondary"
+                >
+                  + {t.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">
