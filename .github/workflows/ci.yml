@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect backend
+        id: guard
+        run: |
+          if [ -f pyproject.toml ]; then echo "exists=true" >> "$GITHUB_OUTPUT";
+          else echo "exists=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: astral-sh/setup-uv@v5
+        if: steps.guard.outputs.exists == 'true'
+        with:
+          enable-cache: true
+      - run: uv sync --dev
+        if: steps.guard.outputs.exists == 'true'
+      - run: uv run ruff check .
+        if: steps.guard.outputs.exists == 'true'
+      - run: uv run ruff format --check .
+        if: steps.guard.outputs.exists == 'true'
+      - run: uv run pytest
+        if: steps.guard.outputs.exists == 'true'
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect frontend
+        id: guard
+        run: |
+          if [ -f package.json ]; then echo "exists=true" >> "$GITHUB_OUTPUT";
+          else echo "exists=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/setup-node@v4
+        if: steps.guard.outputs.exists == 'true'
+        with:
+          node-version: 22
+      - run: npm ci
+        if: steps.guard.outputs.exists == 'true'
+      - run: npx eslint .
+        if: steps.guard.outputs.exists == 'true'
+      - run: npx tsc --noEmit
+        if: steps.guard.outputs.exists == 'true'
+      - run: npm run build
+        if: steps.guard.outputs.exists == 'true'

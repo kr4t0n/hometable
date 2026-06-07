@@ -1,0 +1,36 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+
+# Build artifacts
+dist/
+build/
+
+# Local data volumes (if bind-mounted)
+pgdata/
+miniodata/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
