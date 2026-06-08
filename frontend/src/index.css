@@ -10,7 +10,7 @@
     --card-foreground: 24 16% 14%;
     --popover: 40 56% 99%;
     --popover-foreground: 24 16% 14%;
-    --primary: 13 60% 46%; /* terracotta */
+    --primary: 13 64% 57%; /* terracotta (#D76A4B) */
     --primary-foreground: 38 50% 98%;
     --secondary: 36 30% 90%; /* warm sand */
     --secondary-foreground: 24 16% 20%;
@@ -24,7 +24,7 @@
     --destructive-foreground: 38 50% 98%;
     --border: 34 26% 87%;
     --input: 34 24% 83%;
-    --ring: 13 60% 46%;
+    --ring: 13 64% 57%;
     --radius: 0.75rem;
   }
 
