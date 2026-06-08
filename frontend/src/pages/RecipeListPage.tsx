@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Plus, Search, X } from 'lucide-react'
+import { LayoutGrid, List, Plus, Search, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { RecipeCard } from '@/components/RecipeCard'
+import { RecipeRow } from '@/components/RecipeRow'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,10 +13,19 @@ import { api } from '@/lib/api'
 import { useDebounce } from '@/lib/useDebounce'
 import { cn } from '@/lib/utils'
 
+type View = 'grid' | 'list'
+
 export function RecipeListPage() {
   const [search, setSearch] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [view, setView] = useState<View>(() =>
+    localStorage.getItem('recipeView') === 'list' ? 'list' : 'grid',
+  )
   const q = useDebounce(search, 300)
+
+  useEffect(() => {
+    localStorage.setItem('recipeView', view)
+  }, [view])
 
   const tagsQuery = useQuery({ queryKey: ['tags'], queryFn: () => api.listTags() })
   const { data, isLoading, isError, error } = useQuery({
@@ -70,9 +80,9 @@ export function RecipeListPage() {
         </div>
       </header>
 
-      {tagsQuery.data && tagsQuery.data.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {tagsQuery.data.map((t) => {
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-1 flex-wrap gap-2">
+          {tagsQuery.data?.map((t) => {
             const active = selectedTags.includes(t.name)
             return (
               <button
@@ -91,22 +101,63 @@ export function RecipeListPage() {
             )
           })}
         </div>
-      )}
-
-      {isLoading && (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="overflow-hidden rounded-2xl border bg-card shadow-card">
-              <Skeleton className="aspect-[4/3] rounded-none" />
-              <div className="space-y-3 p-4">
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-1/3" />
-              </div>
-            </div>
+        <div className="inline-flex shrink-0 items-center rounded-full border bg-card p-0.5">
+          {(
+            [
+              ['grid', LayoutGrid, 'Grid view'],
+              ['list', List, 'List view'],
+            ] as const
+          ).map(([key, Icon, label]) => (
+            <button
+              key={key}
+              type="button"
+              aria-label={label}
+              aria-pressed={view === key}
+              onClick={() => setView(key)}
+              className={cn(
+                'flex size-8 items-center justify-center rounded-full transition-colors',
+                view === key
+                  ? 'bg-secondary text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <Icon className="size-4" />
+            </button>
           ))}
         </div>
-      )}
+      </div>
+
+      {isLoading &&
+        (view === 'grid' ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border bg-card shadow-card">
+                <Skeleton className="aspect-[4/3] rounded-none" />
+                <div className="space-y-3 p-4">
+                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-1/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-4 rounded-2xl border bg-card p-3 shadow-card"
+              >
+                <Skeleton className="size-20 rounded-xl sm:size-24" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-5 w-1/2" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
       {isError && (
         <p className="text-destructive">Failed to load recipes: {(error as Error).message}</p>
       )}
@@ -127,13 +178,21 @@ export function RecipeListPage() {
           )}
         </div>
       )}
-      {data && data.length > 0 && (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {data.map((r) => (
-            <RecipeCard key={r.id} recipe={r} />
-          ))}
-        </div>
-      )}
+      {data &&
+        data.length > 0 &&
+        (view === 'grid' ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {data.map((r) => (
+              <RecipeCard key={r.id} recipe={r} />
+            ))}
+          </div>
+        ) : (
+          <div className="mx-auto max-w-3xl space-y-3">
+            {data.map((r) => (
+              <RecipeRow key={r.id} recipe={r} />
+            ))}
+          </div>
+        ))}
     </div>
   )
 }
