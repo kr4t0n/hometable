@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { z } from 'zod'
@@ -139,15 +139,17 @@ export function RecipeEditorPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      <div>
-        <Link
-          to={isEdit ? `/recipes/${recipeId}` : '/'}
-          className="text-sm text-muted-foreground underline"
-        >
-          ← Back
-        </Link>
-        <h1 className="mt-2 font-serif text-3xl font-bold">
-          {isEdit ? 'Edit recipe' : 'New recipe'}
+      <div className="space-y-2">
+        <Button asChild variant="ghost" size="sm" className="-ml-2 text-muted-foreground">
+          <Link to={isEdit ? `/recipes/${recipeId}` : '/'}>
+            <ArrowLeft /> Back
+          </Link>
+        </Button>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+          {isEdit ? 'Edit' : 'New recipe'}
+        </p>
+        <h1 className="text-display font-semibold">
+          {isEdit ? (recipe?.title ?? 'Edit recipe') : 'Create a recipe'}
         </h1>
       </div>
 
