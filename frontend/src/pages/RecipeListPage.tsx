@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Plus, Search, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -25,6 +25,9 @@ export function RecipeListPage() {
         q: q || undefined,
         tag: selectedTags.length ? selectedTags : undefined,
       }),
+    // Keep showing the current results while the next query loads, so typing
+    // updates the grid in place instead of flashing skeletons each keystroke.
+    placeholderData: keepPreviousData,
   })
 
   const toggleTag = (name: string) =>
