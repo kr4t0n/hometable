@@ -12,6 +12,21 @@ path; YouTube/Vimeo embeds are also supported).
 A personal cookbook that *you own and host yourself* — your recipes and media live in your own
 Postgres database and S3-compatible object store, not a third-party service.
 
+## Features
+
+- **Recipes** with ingredients, steps, servings, prep/cook times, and tags/categories.
+- **Photos & video** per recipe (direct-to-S3 uploads, plus YouTube/Vimeo embeds).
+- **Search & filter** by name, ingredient, and tag; grid or list views.
+- **Plan a meal → shopping list.** A meal is several recipes, so select the recipes that make it
+  up and hometable combines their ingredients into one list — quantities with the same name + unit
+  are summed (it understands `2`, `1/2`, `1 1/2`, `1.5`), and free-text amounts like "a pinch" are
+  kept as-is. Tick items off and print the list. Use it two ways:
+  - **Quick / ephemeral** — pick recipes on the Recipes page and view the combined list, nothing
+    saved. Backed by `GET /api/v1/meals/shopping-list?recipe_id=1&recipe_id=2`.
+  - **Saved meals** — name the selection and save it; it shows up under **Meals**, where you can
+    rename it, add/remove recipes, and reuse its shopping list any time. Full CRUD under
+    `/api/v1/meals` (`GET` list, `POST`, `GET/PATCH/DELETE /{id}`, `GET /{id}/shopping-list`).
+
 ## Tech stack
 
 | Layer | Choice |

@@ -116,3 +116,49 @@ class RecipeListItem(BaseModel):
     servings: int | None = None
     total_time_min: int | None = None
     tags: list[TagOut] = Field(default_factory=list)
+
+
+# ── Meals / shopping list ─────────────────────────────────────────────
+class AggregatedIngredient(BaseModel):
+    name: str
+    unit: str | None = None
+    quantity: str | None = None  # combined human-readable amount, e.g. "3 cups"
+    recipe_count: int  # how many of the selected recipes call for this ingredient
+
+
+class MealShoppingList(BaseModel):
+    recipe_ids: list[int]
+    recipe_titles: list[str]
+    items: list[AggregatedIngredient]
+
+
+# ── Saved meals ───────────────────────────────────────────────────────
+class MealCreate(BaseModel):
+    name: str
+    notes: str | None = None
+    recipe_ids: list[int] = Field(default_factory=list)  # in display order
+
+
+class MealUpdate(BaseModel):
+    name: str | None = None
+    notes: str | None = None
+    recipe_ids: list[int] | None = None  # full replacement of the recipe set
+
+
+class MealListItem(BaseModel):
+    id: int
+    name: str
+    recipe_count: int
+    cover_url: str | None = None  # cover of the first recipe, for a thumbnail
+    created_at: datetime
+    updated_at: datetime
+
+
+class MealOut(BaseModel):
+    id: int
+    name: str
+    notes: str | None = None
+    recipes: list[RecipeListItem] = Field(default_factory=list)
+    items: list[AggregatedIngredient] = Field(default_factory=list)  # combined shopping list
+    created_at: datetime
+    updated_at: datetime

@@ -54,12 +54,13 @@ def readyz() -> JSONResponse:
     )
 
 
-# Resource routers (recipes, tags) are registered in Phase 3.
+# Resource routers (recipes, tags, meals) are registered here.
 def register_routers() -> None:
-    from hometable.routers import recipes, tags
+    from hometable.routers import meals, recipes, tags
 
     app.include_router(recipes.router, prefix="/api/v1")
     app.include_router(tags.router, prefix="/api/v1")
+    app.include_router(meals.router, prefix="/api/v1")
 
 
 try:

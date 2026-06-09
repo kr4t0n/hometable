@@ -90,6 +90,46 @@ export interface MediaInit {
   upload_url: string | null
 }
 
+export interface AggregatedIngredient {
+  name: string
+  unit: string | null
+  quantity: string | null // combined human-readable amount, e.g. "3 cups"
+  recipe_count: number
+}
+
+export interface MealShoppingList {
+  recipe_ids: number[]
+  recipe_titles: string[]
+  items: AggregatedIngredient[]
+}
+
+export interface Meal {
+  id: number
+  name: string
+  notes: string | null
+  recipes: RecipeListItem[]
+  items: AggregatedIngredient[] // combined shopping list
+  created_at: string
+  updated_at: string
+}
+
+export interface MealListItem {
+  id: number
+  name: string
+  recipe_count: number
+  cover_url: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface MealCreate {
+  name: string
+  notes?: string | null
+  recipe_ids?: number[]
+}
+
+export type MealUpdate = Partial<MealCreate>
+
 const BASE = '/api/v1'
 
 async function http<T>(path: string, options?: RequestInit): Promise<T> {
@@ -135,6 +175,22 @@ export const api = {
     http<Recipe>(`/recipes/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
   deleteRecipe: (id: number) => http<void>(`/recipes/${id}`, { method: 'DELETE' }),
   listTags: () => http<Tag[]>('/tags'),
+
+  // Combine several recipes (a "meal") into one aggregated shopping list (ephemeral).
+  getShoppingList: (recipeIds: number[]) => {
+    const qs = new URLSearchParams()
+    for (const id of recipeIds) qs.append('recipe_id', String(id))
+    return http<MealShoppingList>(`/meals/shopping-list?${qs.toString()}`)
+  },
+
+  // Saved meals
+  listMeals: () => http<MealListItem[]>('/meals'),
+  getMeal: (id: number) => http<Meal>(`/meals/${id}`),
+  createMeal: (body: MealCreate) =>
+    http<Meal>('/meals', { method: 'POST', body: JSON.stringify(body) }),
+  updateMeal: (id: number, body: MealUpdate) =>
+    http<Meal>(`/meals/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  deleteMeal: (id: number) => http<void>(`/meals/${id}`, { method: 'DELETE' }),
 
   // media
   initMedia: (

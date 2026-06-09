@@ -46,11 +46,18 @@ object store handle range requests (video seeking) natively.
 - `main.py` — FastAPI app, CORS, router registration, `/healthz` + `/readyz`.
 - `config.py` — settings from env (pydantic-settings).
 - `database.py` — SQLAlchemy engine/session.
-- `models.py` — ORM models: Recipe, Ingredient, Step, Media, Tag (+ join).
+- `models.py` — ORM models: Recipe, Ingredient, Step, Media, Tag (+ join); Meal + MealRecipe
+  (saved meals; `MealRecipe` is an association object carrying `position`).
 - `schemas.py` — Pydantic request/response models.
 - `storage.py` — `Storage` interface + S3 implementation (boto3 → MinIO); presign + bucket
   bootstrap.
-- `routers/` — `recipes.py`, `tags.py` (+ media endpoints under recipes).
+- `aggregate.py` — pure, DB-free logic that merges several recipes' ingredients into one shopping
+  list (group by name+unit, sum numeric quantities with `Fraction`, keep free-text amounts as-is).
+- `routers/` — `recipes.py`, `tags.py` (+ media endpoints under recipes), `meals.py`. Meals covers
+  both the **ephemeral** combined list (`GET /meals/shopping-list?recipe_id=…`) and **saved meal**
+  CRUD (`GET/POST /meals`, `GET/PATCH/DELETE /meals/{id}`, `GET /meals/{id}/shopping-list`). The
+  compact recipe representation is built by `recipes.list_item_from_recipe`, imported by the meals
+  router so both render list items identically.
 
 ## Conventions
 
@@ -69,6 +76,20 @@ object store handle range requests (video seeking) natively.
   media should be shown. Orphaned `pending` rows (abandoned uploads) may need periodic cleanup.
 - **No transcoding in v1.** We accept what the browser can natively play (`.mp4`/H.264). No
   thumbnail generation for video yet.
+- **Ingredient quantity is free text, not a number** (`"2"`, `"1/2"`, `"a pinch"`). The shopping
+  list only sums quantities it can parse (int / decimal / fraction / mixed number) *and* that share
+  the same unit; everything else is listed verbatim. Same ingredient with different units (e.g.
+  `cup` vs `ml`) stays as separate lines — there is no unit conversion.
+- **Two meal flows share one router.** "Plan a meal" supports an *ephemeral* path (multi-select →
+  `/shopping-list?ids=…`, nothing saved) and a *saved* path (`Meal` rows). Both end up calling the
+  same `aggregate_ingredients()`.
+- **Meals route ordering matters.** The literal `GET /meals/shopping-list` is declared *before*
+  `GET /meals/{meal_id}` in `meals.py` — otherwise `"shopping-list"` is captured by the dynamic
+  route and rejected as a non-int `meal_id` (422). Keep static segments above dynamic ones.
+- **Deleting a recipe cascades out of meals via the DB, not the ORM.** `Recipe` has no relationship
+  back to `MealRecipe` (avoids a double delete-orphan parent), so removal relies on the
+  `meal_recipes.recipe_id` FK `ON DELETE CASCADE`. Postgres enforces this; SQLite does not unless
+  asked, so the test fixture (`conftest.py`) turns on `PRAGMA foreign_keys=ON` to match prod.
 
 ## Build phases
 
@@ -80,9 +101,13 @@ object store handle range requests (video seeking) natively.
 6. Search, tags & categories ✅
 7. Dev/test packaging (Dockerfiles + full Compose) ✅
 8. Helm chart (k8s, external Postgres + MinIO) ✅
+9. Meal shopping list — combine selected recipes' ingredients (ephemeral) ✅
+10. Saved meals — `Meal`/`MealRecipe` tables, CRUD API, Meals list/detail pages, "Save as meal" ✅
 
 ## Planned / deferred (v2)
 
-Meal-planning calendar, shopping-list generation, household accounts & auth, and AI features
-(photo→recipe extraction, recommendations, `pgvector` semantic search). The schema reserves a
-nullable `user_id` on recipes to make multi-user additive.
+Meal-planning calendar (scheduling meals by date), household accounts & auth, and AI features
+(photo→recipe extraction, recommendations, `pgvector` semantic search). Possible shopping-list
+upgrades: unit conversion/normalisation and scaling quantities by per-recipe servings (the
+`MealRecipe` association object is the place to hang a scale factor). The schema reserves a nullable
+`user_id` on recipes to make multi-user additive.

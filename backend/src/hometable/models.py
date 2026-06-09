@@ -116,3 +116,43 @@ class Tag(Base):
     kind: Mapped[str] = mapped_column(String(16), default="tag")  # tag | category
 
     recipes: Mapped[list[Recipe]] = relationship(secondary=recipe_tags, back_populates="tags")
+
+
+class Meal(Base):
+    """A saved, named plan: a meal is composed of several recipes whose
+    ingredients combine into one shopping list (see ``hometable.aggregate``)."""
+
+    __tablename__ = "meals"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    notes: Mapped[str | None] = mapped_column(Text, default=None)
+    # Reserved for future multi-user / auth, mirroring Recipe.user_id.
+    user_id: Mapped[int | None] = mapped_column(default=None, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    # Association object (not a bare M2M) so we can order recipes within a meal
+    # — and later hang per-recipe data (e.g. planned servings) off the link.
+    recipe_links: Mapped[list[MealRecipe]] = relationship(
+        back_populates="meal",
+        cascade="all, delete-orphan",
+        order_by="MealRecipe.position",
+    )
+
+
+class MealRecipe(Base):
+    __tablename__ = "meal_recipes"
+
+    meal_id: Mapped[int] = mapped_column(
+        ForeignKey("meals.id", ondelete="CASCADE"), primary_key=True
+    )
+    recipe_id: Mapped[int] = mapped_column(
+        ForeignKey("recipes.id", ondelete="CASCADE"), primary_key=True
+    )
+    position: Mapped[int] = mapped_column(default=0)
+
+    meal: Mapped[Meal] = relationship(back_populates="recipe_links")
+    recipe: Mapped[Recipe] = relationship()

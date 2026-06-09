@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { LayoutGrid, List, Plus, Search, X } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { BookmarkPlus, ClipboardList, LayoutGrid, List, ListChecks, Plus, Search, X } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { RecipeCard } from '@/components/RecipeCard'
 import { RecipeRow } from '@/components/RecipeRow'
@@ -21,6 +21,14 @@ export function RecipeListPage() {
   const [view, setView] = useState<View>(() =>
     localStorage.getItem('recipeView') === 'list' ? 'list' : 'grid',
   )
+  // "Plan a meal" selection mode: pick several recipes, then combine their
+  // ingredients into one shopping list — or save them as a reusable meal.
+  const [selecting, setSelecting] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [naming, setNaming] = useState(false)
+  const [mealName, setMealName] = useState('')
+  const navigate = useNavigate()
+  const qc = useQueryClient()
   const q = useDebounce(search, 300)
 
   useEffect(() => {
@@ -44,6 +52,24 @@ export function RecipeListPage() {
     setSelectedTags((prev) =>
       prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name],
     )
+
+  const toggleSelect = (id: number) =>
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+
+  const toggleSelecting = () => {
+    setSelecting((prev) => !prev)
+    setSelectedIds([])
+    setNaming(false)
+    setMealName('')
+  }
+
+  const saveMeal = useMutation({
+    mutationFn: () => api.createMeal({ name: mealName.trim(), recipe_ids: selectedIds }),
+    onSuccess: (meal) => {
+      qc.invalidateQueries({ queryKey: ['meals'] })
+      navigate(`/meals/${meal.id}`)
+    },
+  })
 
   const hasFilters = q.length > 0 || selectedTags.length > 0
 
@@ -101,6 +127,17 @@ export function RecipeListPage() {
             )
           })}
         </div>
+        <Button
+          type="button"
+          variant={selecting ? 'default' : 'outline'}
+          size="sm"
+          onClick={toggleSelecting}
+          className="shrink-0 rounded-full"
+          aria-pressed={selecting}
+        >
+          <ListChecks />
+          <span className="hidden sm:inline">{selecting ? 'Cancel' : 'Plan a meal'}</span>
+        </Button>
         <div className="inline-flex shrink-0 items-center rounded-full border bg-card p-0.5">
           {(
             [
@@ -183,16 +220,86 @@ export function RecipeListPage() {
         (view === 'grid' ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {data.map((r) => (
-              <RecipeCard key={r.id} recipe={r} />
+              <RecipeCard
+                key={r.id}
+                recipe={r}
+                selectable={selecting}
+                selected={selectedIds.includes(r.id)}
+                onToggleSelect={() => toggleSelect(r.id)}
+              />
             ))}
           </div>
         ) : (
           <div className="mx-auto max-w-3xl space-y-3">
             {data.map((r) => (
-              <RecipeRow key={r.id} recipe={r} />
+              <RecipeRow
+                key={r.id}
+                recipe={r}
+                selectable={selecting}
+                selected={selectedIds.includes(r.id)}
+                onToggleSelect={() => toggleSelect(r.id)}
+              />
             ))}
           </div>
         ))}
+
+      {selecting && (
+        <div className="sticky bottom-4 z-20 mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card/95 px-4 py-3 shadow-lift backdrop-blur">
+          {naming ? (
+            <form
+              className="flex w-full items-center gap-2"
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (mealName.trim() && !saveMeal.isPending) saveMeal.mutate()
+              }}
+            >
+              <Input
+                value={mealName}
+                onChange={(e) => setMealName(e.target.value)}
+                placeholder="Name this meal…"
+                className="h-9 flex-1"
+                autoFocus
+              />
+              <Button type="submit" size="sm" disabled={!mealName.trim() || saveMeal.isPending}>
+                {saveMeal.isPending ? 'Saving…' : 'Save'}
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setNaming(false)}>
+                Cancel
+              </Button>
+            </form>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                {selectedIds.length === 0 ? (
+                  'Select recipes to combine into a shopping list.'
+                ) : (
+                  <>
+                    <span className="num font-semibold text-foreground">{selectedIds.length}</span>{' '}
+                    {selectedIds.length === 1 ? 'recipe' : 'recipes'} selected
+                  </>
+                )}
+              </p>
+              {selectedIds.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedIds([])}>
+                    Clear
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setNaming(true)}>
+                    <BookmarkPlus />
+                    Save as meal
+                  </Button>
+                  <Button asChild size="sm">
+                    <Link to={`/shopping-list?ids=${selectedIds.join(',')}`}>
+                      <ClipboardList />
+                      Shopping list
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }

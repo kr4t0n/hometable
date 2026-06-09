@@ -65,6 +65,22 @@ def _cover_url(recipe: Recipe, storage: S3Storage) -> str | None:
     return None
 
 
+def list_item_from_recipe(recipe: Recipe, storage: S3Storage) -> schemas.RecipeListItem:
+    """Build the compact list representation of a recipe. Shared with the meals router."""
+    total = None
+    if recipe.prep_time_min or recipe.cook_time_min:
+        total = (recipe.prep_time_min or 0) + (recipe.cook_time_min or 0)
+    return schemas.RecipeListItem(
+        id=recipe.id,
+        title=recipe.title,
+        description=recipe.description,
+        cover_url=_cover_url(recipe, storage),
+        servings=recipe.servings,
+        total_time_min=total,
+        tags=[schemas.TagOut.model_validate(t) for t in recipe.tags],
+    )
+
+
 def _recipe_out(recipe: Recipe, storage: S3Storage) -> schemas.RecipeOut:
     return schemas.RecipeOut(
         id=recipe.id,
@@ -129,23 +145,7 @@ def list_recipes(
         stmt = stmt.where(Recipe.tags.any(Tag.name.in_(tag)))
     stmt = stmt.order_by(Recipe.created_at.desc(), Recipe.id.desc()).limit(limit).offset(offset)
 
-    items: list[schemas.RecipeListItem] = []
-    for r in db.scalars(stmt).unique().all():
-        total = None
-        if r.prep_time_min or r.cook_time_min:
-            total = (r.prep_time_min or 0) + (r.cook_time_min or 0)
-        items.append(
-            schemas.RecipeListItem(
-                id=r.id,
-                title=r.title,
-                description=r.description,
-                cover_url=_cover_url(r, storage),
-                servings=r.servings,
-                total_time_min=total,
-                tags=[schemas.TagOut.model_validate(t) for t in r.tags],
-            )
-        )
-    return items
+    return [list_item_from_recipe(r, storage) for r in db.scalars(stmt).unique().all()]
 
 
 @router.post("/recipes", response_model=schemas.RecipeOut, status_code=201)
