@@ -3,30 +3,32 @@
 @tailwind utilities;
 
 @layer base {
-  /* "Apricot Cream": built around #F1D9C3 — apricot canvas, warm-white cards,
-     toasted cocoa primary. In dark mode #F1D9C3 itself becomes the primary. */
+  /* "Apricot Cream": #F1D9C3 is the action color — buttons and fills — with
+     cocoa text on it, sitting on a quiet warm-cream canvas. Burnt sienna
+     carries text emphasis (eyebrows, icons, hovers), since the apricot is too
+     light to read as text. In dark mode #F1D9C3 stays the primary. */
   :root {
-    --background: 29 62% 86%; /* apricot cream (#F1D9C3) */
+    --background: 32 45% 96%; /* quiet warm cream */
     --foreground: 22 28% 14%; /* cocoa ink */
-    --card: 30 60% 98%;
+    --card: 30 60% 99%;
     --card-foreground: 22 28% 14%;
-    --popover: 30 60% 98%;
+    --popover: 30 60% 99%;
     --popover-foreground: 22 28% 14%;
-    --primary: 22 45% 30%; /* toasted cocoa (#6F432A) */
-    --primary-foreground: 30 60% 97%;
-    --secondary: 29 55% 91%; /* lighter apricot for fills on cards */
+    --primary: 29 62% 86%; /* apricot (#F1D9C3) — the button color */
+    --primary-foreground: 22 35% 16%;
+    --secondary: 29 50% 91%;
     --secondary-foreground: 22 28% 18%;
-    --muted: 29 45% 92%;
-    --muted-foreground: 25 18% 38%;
-    --accent: 16 55% 40%; /* burnt sienna (tags) */
+    --muted: 29 40% 92%;
+    --muted-foreground: 25 16% 39%;
+    --accent: 16 55% 40%; /* burnt sienna (tags + text emphasis) */
     --accent-foreground: 30 60% 97%;
     --honey: 38 70% 48%; /* golden amber — tertiary warmth */
     --honey-foreground: 26 30% 14%;
     --destructive: 358 60% 44%;
     --destructive-foreground: 30 60% 97%;
-    --border: 28 30% 78%;
-    --input: 28 30% 74%;
-    --ring: 22 45% 30%;
+    --border: 28 26% 86%;
+    --input: 28 26% 80%;
+    --ring: 22 45% 30%; /* cocoa — apricot is too light for focus rings */
     --radius: 0.75rem;
   }
 
@@ -37,7 +39,7 @@
     --card-foreground: 32 30% 90%;
     --popover: 22 16% 13%;
     --popover-foreground: 32 30% 90%;
-    --primary: 29 62% 86%; /* #F1D9C3 — the apricot takes the lead at night */
+    --primary: 29 62% 86%; /* #F1D9C3 — same button color at night */
     --primary-foreground: 22 30% 12%;
     --secondary: 24 10% 19%;
     --secondary-foreground: 32 30% 90%;
@@ -75,7 +77,8 @@
     @apply font-serif tracking-tight;
   }
   ::selection {
-    background: hsl(var(--primary) / 0.18);
+    /* accent-based: the apricot primary is too light to show as a selection */
+    background: hsl(var(--accent) / 0.18);
   }
 }
 

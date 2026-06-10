@@ -38,14 +38,15 @@ object store handle range requests (video seeking) natively.
   optional quick-start and is used for fast unit tests.
 - **Two deploy targets.** Docker Compose bundles Postgres + MinIO for dev/CI. The Helm chart ships
   only the app and points at **external** Postgres + MinIO (existing infra).
-- **Design system: "Apricot Cream."** Built around the brand color `#F1D9C3`: it is the page
-  background in light mode (warm-white cards float on it; toasted-cocoa primary, burnt-sienna
-  tags) and becomes the primary itself in dark mode (cocoa-night charcoal). Fraunces + Inter
+- **Design system: "Apricot Cream."** Built around the brand color `#F1D9C3`, used as the
+  **action color**: `--primary` is the apricot itself (buttons, active chips, checkboxes, logo
+  chip) with cocoa text on it, sitting on a quiet warm-cream canvas. Because the primary is light,
+  it must never be used *as text* — burnt sienna (`--accent`) carries text emphasis (eyebrow
+  labels, icons, hover titles, step-number outlines), and `--ring` is cocoa so focus rings stay
+  visible. Dark mode is cocoa-night charcoal with the same apricot primary. Fraunces + Inter
   (self-hosted fonts), shadcn/ui components vendored in-repo. Tokens are CSS variables in
-  `src/index.css`, so a palette swap touches only that file (plus the shadow tint in
-  `tailwind.config.ts`). Earlier palettes in git history: terracotta "Warm Cookbook" (original),
-  green "Evergreen Bistro" (reverted), plum "Fig & Honey", "Slate & Copper",
-  "Espresso & Caramel".
+  `src/index.css`. Earlier palettes in git history: terracotta "Warm Cookbook" (original), green
+  "Evergreen Bistro" (reverted), plum "Fig & Honey", "Slate & Copper", "Espresso & Caramel".
 
 ## Module responsibilities (backend)
 

@@ -17,7 +17,7 @@ export function RecipeCard({ recipe, selectable, selected, onToggleSelect }: Rec
     <article
       className={cn(
         'flex h-full flex-col overflow-hidden rounded-2xl border bg-card shadow-card transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lift',
-        selected && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
+        selected && 'ring-2 ring-accent ring-offset-2 ring-offset-background',
       )}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
@@ -55,7 +55,7 @@ export function RecipeCard({ recipe, selectable, selected, onToggleSelect }: Rec
 
       {/* Fixed-height text block: meta pinned to the bottom so cards align. */}
       <div className="flex h-40 flex-col p-4">
-        <h3 className="line-clamp-2 font-serif text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
+        <h3 className="line-clamp-2 font-serif text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-accent">
           {recipe.title}
         </h3>
         {recipe.description && (

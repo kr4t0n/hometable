@@ -124,7 +124,7 @@ export function RecipeDetailPage() {
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-y py-3 text-sm">
           {totalTime != null && (
             <span className="num inline-flex items-center gap-2">
-              <Clock className="size-4 text-primary" />
+              <Clock className="size-4 text-accent" />
               <span>
                 <span className="font-medium">{totalTime} min</span> total
               </span>
@@ -138,7 +138,7 @@ export function RecipeDetailPage() {
           )}
           {baseServings != null && (
             <span className="num inline-flex items-center gap-2">
-              <Users className="size-4 text-primary" />
+              <Users className="size-4 text-accent" />
               {baseServings} servings
             </span>
           )}
@@ -266,7 +266,7 @@ export function RecipeDetailPage() {
                       'num flex size-9 shrink-0 items-center justify-center rounded-full border font-serif text-lg font-semibold transition-colors',
                       done
                         ? 'border-transparent bg-primary text-primary-foreground'
-                        : 'border-primary/25 text-primary hover:border-primary/60',
+                        : 'border-accent/30 text-accent hover:border-accent/60',
                     )}
                   >
                     {done ? <Check className="size-4" /> : idx + 1}

@@ -17,7 +17,7 @@ export function RecipeRow({ recipe, selectable, selected, onToggleSelect }: Reci
     <article
       className={cn(
         'flex items-center gap-4 rounded-2xl border bg-card p-3 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift',
-        selected && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
+        selected && 'ring-2 ring-accent ring-offset-2 ring-offset-background',
       )}
     >
       <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-muted sm:size-24">
@@ -35,7 +35,7 @@ export function RecipeRow({ recipe, selectable, selected, onToggleSelect }: Reci
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="truncate font-serif text-lg font-semibold tracking-tight transition-colors group-hover:text-primary">
+        <h3 className="truncate font-serif text-lg font-semibold tracking-tight transition-colors group-hover:text-accent">
           {recipe.title}
         </h3>
         {recipe.description && (

@@ -15,7 +15,7 @@ export function MealsListPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-1.5 border-b pb-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Planning</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Planning</p>
         <h1 className="text-display font-semibold">Meals</h1>
         <p className="max-w-md text-muted-foreground">
           Saved plans — each gathers a few recipes into one shopping list.
@@ -76,7 +76,7 @@ export function MealsListPage() {
                   )}
                 </div>
                 <div className="flex flex-1 flex-col p-4">
-                  <h3 className="font-serif text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
+                  <h3 className="font-serif text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-accent">
                     {m.name}
                   </h3>
                   <p className="num mt-1 text-sm text-muted-foreground">

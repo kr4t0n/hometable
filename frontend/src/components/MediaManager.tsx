@@ -97,7 +97,7 @@ export function MediaManager({ recipe }: { recipe: Recipe }) {
         }}
         className={cn(
           'flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors',
-          dragOver ? 'border-primary bg-primary/5' : 'border-border',
+          dragOver ? 'border-accent bg-accent/5' : 'border-border',
         )}
       >
         <Upload className="size-5 text-muted-foreground" />

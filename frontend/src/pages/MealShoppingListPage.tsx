@@ -37,7 +37,7 @@ export function MealShoppingListPage() {
         </Button>
         <div className="flex items-end justify-between gap-4">
           <div className="space-y-1.5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
               Your meal
             </p>
             <h1 className="text-display font-semibold">Shopping list</h1>

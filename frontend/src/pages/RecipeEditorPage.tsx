@@ -165,7 +165,7 @@ export function RecipeEditorPage() {
             <ArrowLeft /> Back
           </Link>
         </Button>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
           {isEdit ? 'Edit' : 'New recipe'}
         </p>
         <h1 className="text-display font-semibold">

@@ -82,7 +82,7 @@ export function RecipeListPage() {
     <div className="space-y-8">
       <header className="flex flex-col gap-5 border-b pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
             Your cookbook
           </p>
           <h1 className="text-display font-semibold">Recipes</h1>

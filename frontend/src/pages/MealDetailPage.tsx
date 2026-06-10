@@ -120,7 +120,7 @@ export function MealDetailPage() {
       </div>
 
       <header className="space-y-2 border-b pb-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Your meal</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Your meal</p>
         {editing ? (
           <div className="space-y-3">
             <Input
@@ -187,7 +187,7 @@ export function MealDetailPage() {
                       </div>
                     )}
                   </div>
-                  <span className="truncate font-medium transition-colors group-hover:text-primary">
+                  <span className="truncate font-medium transition-colors group-hover:text-accent">
                     {r.title}
                   </span>
                 </Link>
