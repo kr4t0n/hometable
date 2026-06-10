@@ -3,54 +3,54 @@
 @tailwind utilities;
 
 @layer base {
-  /* "Fig & Honey": deep fig plum, honey gold & copper on blush parchment. */
+  /* "Slate & Copper": slate blue + copper on warm linen — calm, modern kitchen. */
   :root {
-    --background: 32 33% 96%; /* blush parchment */
-    --foreground: 320 10% 14%; /* plum ink */
-    --card: 36 45% 99%;
-    --card-foreground: 320 10% 14%;
-    --popover: 36 45% 99%;
-    --popover-foreground: 320 10% 14%;
-    --primary: 318 32% 36%; /* fig / aubergine (#793E68) */
-    --primary-foreground: 36 45% 97%;
-    --secondary: 24 24% 90%; /* rosy sand */
-    --secondary-foreground: 320 10% 18%;
-    --muted: 26 22% 92%;
-    --muted-foreground: 320 6% 40%;
-    --accent: 38 58% 36%; /* honey gold (tags) */
-    --accent-foreground: 36 45% 97%;
-    --honey: 25 60% 46%; /* copper — tertiary warmth */
-    --honey-foreground: 20 30% 14%;
-    --destructive: 4 64% 46%;
-    --destructive-foreground: 36 45% 97%;
-    --border: 28 20% 86%;
-    --input: 28 20% 82%;
-    --ring: 318 32% 36%;
+    --background: 40 18% 96%; /* warm linen (kept warm so food photos read well) */
+    --foreground: 215 18% 15%; /* slate ink */
+    --card: 40 25% 99%;
+    --card-foreground: 215 18% 15%;
+    --popover: 40 25% 99%;
+    --popover-foreground: 215 18% 15%;
+    --primary: 214 32% 38%; /* slate blue (#42597F) */
+    --primary-foreground: 40 30% 98%;
+    --secondary: 38 16% 90%; /* warm greige */
+    --secondary-foreground: 215 18% 18%;
+    --muted: 38 14% 92%;
+    --muted-foreground: 220 8% 42%;
+    --accent: 22 60% 40%; /* copper (tags) */
+    --accent-foreground: 40 30% 98%;
+    --honey: 36 60% 46%; /* amber — tertiary warmth */
+    --honey-foreground: 26 30% 14%;
+    --destructive: 2 62% 46%;
+    --destructive-foreground: 40 30% 98%;
+    --border: 36 14% 86%;
+    --input: 36 14% 82%;
+    --ring: 214 32% 38%;
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 315 12% 9%; /* late-night plum charcoal */
-    --foreground: 30 25% 90%;
-    --card: 315 10% 13%;
-    --card-foreground: 30 25% 90%;
-    --popover: 315 10% 13%;
-    --popover-foreground: 30 25% 90%;
-    --primary: 318 32% 64%; /* orchid, lifted for dark contrast */
-    --primary-foreground: 318 25% 10%;
-    --secondary: 315 7% 20%;
-    --secondary-foreground: 30 25% 90%;
-    --muted: 315 7% 18%;
-    --muted-foreground: 320 8% 62%;
-    --accent: 40 55% 58%;
-    --accent-foreground: 35 30% 10%;
-    --honey: 28 55% 58%;
-    --honey-foreground: 20 30% 10%;
-    --destructive: 4 60% 54%;
-    --destructive-foreground: 30 25% 92%;
-    --border: 315 7% 22%;
-    --input: 315 7% 26%;
-    --ring: 318 32% 64%;
+    --background: 218 16% 9%; /* slate night */
+    --foreground: 36 18% 89%;
+    --card: 218 14% 13%;
+    --card-foreground: 36 18% 89%;
+    --popover: 218 14% 13%;
+    --popover-foreground: 36 18% 89%;
+    --primary: 214 45% 66%; /* soft denim, lifted for dark contrast */
+    --primary-foreground: 218 30% 9%;
+    --secondary: 218 10% 19%;
+    --secondary-foreground: 36 18% 89%;
+    --muted: 218 10% 17%;
+    --muted-foreground: 220 10% 62%;
+    --accent: 24 60% 58%;
+    --accent-foreground: 24 30% 10%;
+    --honey: 36 55% 56%;
+    --honey-foreground: 26 30% 10%;
+    --destructive: 2 58% 54%;
+    --destructive-foreground: 36 18% 92%;
+    --border: 218 10% 21%;
+    --input: 218 10% 25%;
+    --ring: 214 45% 66%;
   }
 }
 

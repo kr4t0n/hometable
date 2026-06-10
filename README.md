@@ -34,7 +34,7 @@ Postgres database and S3-compatible object store, not a third-party service.
 
 | Layer | Choice |
 |---|---|
-| Frontend | React + TypeScript + Vite + Tailwind + shadcn/ui ("Fig & Honey" design system) |
+| Frontend | React + TypeScript + Vite + Tailwind + shadcn/ui ("Slate & Copper" design system) |
 | Backend | Python + FastAPI + SQLAlchemy + Alembic |
 | Database | Postgres |
 | Object storage | S3-compatible (MinIO locally; AWS S3 / Cloudflare R2 in prod) |
