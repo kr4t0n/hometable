@@ -39,7 +39,9 @@
     --card-foreground: 32 30% 90%;
     --popover: 22 16% 13%;
     --popover-foreground: 32 30% 90%;
-    --primary: 29 62% 86%; /* #F1D9C3 — same button color at night */
+    /* Toasted apricot (#E0C0A3): #F1D9C3's dark-mode counterpart — dimmed and
+       slightly desaturated so large fills don't glow against the dark canvas. */
+    --primary: 28 50% 76%;
     --primary-foreground: 22 30% 12%;
     --secondary: 26 14% 19%;
     --secondary-foreground: 32 30% 90%;
@@ -53,7 +55,7 @@
     --destructive-foreground: 32 30% 92%;
     --border: 26 14% 22%;
     --input: 26 14% 26%;
-    --ring: 29 62% 86%;
+    --ring: 28 50% 76%;
   }
 }
 

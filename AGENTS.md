@@ -46,9 +46,11 @@ object store handle range requests (video seeking) natively.
   pills (`bg-primary/25 border-primary/40`), and empty states get a faint `bg-primary/5` wash.
   Because the primary is light, it must never be used *as text* — burnt sienna (`--accent`)
   carries text emphasis (eyebrow labels, icons, hover titles, step-number outlines), and `--ring`
-  is cocoa so focus rings stay visible. Dark mode is cocoa-night charcoal with the same apricot
-  primary. Fraunces + Inter (self-hosted fonts), shadcn/ui components vendored in-repo. Tokens are
-  CSS variables in `src/index.css`. Earlier palettes in git history: terracotta "Warm Cookbook"
+  is cocoa so focus rings stay visible. Dark mode is cocoa-night charcoal where the primary is a
+  **toasted-apricot counterpart** of the brand color (`hsl(28 50% 76%)` ≈ `#E0C0A3`, dimmed and
+  desaturated) rather than `#F1D9C3` verbatim — full-luminance fills bloom against dark surfaces.
+  Fraunces + Inter (self-hosted fonts), shadcn/ui components vendored in-repo. Tokens are CSS
+  variables in `src/index.css`. Earlier palettes in git history: terracotta "Warm Cookbook"
   (original), green "Evergreen Bistro" (reverted), plum "Fig & Honey", "Slate & Copper",
   "Espresso & Caramel".
 
