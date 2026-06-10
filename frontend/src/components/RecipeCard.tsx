@@ -45,10 +45,10 @@ export function RecipeCard({ recipe, selectable, selected, onToggleSelect }: Rec
               'absolute right-3 top-3 flex size-7 items-center justify-center rounded-full border-2 shadow-sm transition-colors',
               selected
                 ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-white/80 bg-background/70 text-transparent backdrop-blur',
+                : 'border-white/80 bg-background/70 backdrop-blur',
             )}
           >
-            <Check className="size-4" />
+            {selected && <Check className="size-4" />}
           </span>
         )}
       </div>

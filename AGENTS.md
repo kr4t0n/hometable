@@ -65,6 +65,12 @@ object store handle range requests (video seeking) natively.
 - Backend: `uv` for deps, `ruff` for lint+format, `pytest` for tests. API under `/api/v1`.
 - Frontend: TypeScript + Tailwind utilities + shadcn/ui; ESLint flat config; TanStack Query for
   server state; react-hook-form + zod for forms.
+- Frontend UI patterns: destructive actions use the inline two-step `ConfirmButton`
+  (`components/ui/confirm-button.tsx`) — never `window.confirm` or a modal. Long option lists get
+  a searchable popover (`components/AddRecipePicker.tsx`), not a native `<select>`. Check-off
+  interactions (shopping list, recipe ingredients/steps) are deliberately ephemeral component
+  state — nothing persists. Recipe detail is editorial: title/description/meta first, hero media
+  after. Print views rely on `print:hidden`; the global header/footer are hidden in `Layout`.
 
 ## Gotchas (non-obvious)
 

@@ -9,7 +9,7 @@ export function Layout() {
   const { theme, toggle } = useTheme()
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md print:hidden">
         <div className="container flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-6">
             <Link to="/" className="group inline-flex items-center gap-2.5">
@@ -61,7 +61,7 @@ export function Layout() {
         <Outlet />
       </main>
 
-      <footer className="border-t">
+      <footer className="border-t print:hidden">
         <div className="container flex h-14 items-center justify-between text-xs text-muted-foreground">
           <span>hometable — your kitchen, collected.</span>
           <span className="font-serif italic">made at home</span>

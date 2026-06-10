@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, type KeyboardEvent, type ReactNode } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -85,6 +85,16 @@ function toPayload(v: FormValues): RecipeCreate {
   }
 }
 
+// Card-style grouping so the long form reads as a few digestible chapters.
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="space-y-4 rounded-2xl border bg-card p-5 shadow-card sm:p-6">
+      <h2 className="font-serif text-xl font-semibold">{title}</h2>
+      {children}
+    </section>
+  )
+}
+
 export function RecipeEditorPage() {
   const { id } = useParams()
   const isEdit = Boolean(id)
@@ -115,6 +125,15 @@ export function RecipeEditorPage() {
     }
   }
 
+  // Enter inside an ingredient row inserts the next row (instead of submitting
+  // the whole form) and moves focus into it — fast entry for long lists.
+  const onIngredientKeyDown = (idx: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    ingredients.insert(idx + 1, { name: '', quantity: '', unit: '' })
+    setTimeout(() => form.setFocus(`ingredients.${idx + 1}.quantity`), 0)
+  }
+
   const save = useMutation({
     mutationFn: (payload: RecipeCreate | RecipeUpdate) =>
       isEdit ? api.updateRecipe(recipeId, payload) : api.createRecipe(payload as RecipeCreate),
@@ -136,12 +155,13 @@ export function RecipeEditorPage() {
 
   const onSubmit = form.handleSubmit((v) => save.mutate(toPayload(v)))
   const { errors } = form.formState
+  const backHref = isEdit ? `/recipes/${recipeId}` : '/'
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div className="space-y-2">
         <Button asChild variant="ghost" size="sm" className="-ml-2 text-muted-foreground">
-          <Link to={isEdit ? `/recipes/${recipeId}` : '/'}>
+          <Link to={backHref}>
             <ArrowLeft /> Back
           </Link>
         </Button>
@@ -154,72 +174,88 @@ export function RecipeEditorPage() {
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
-          <Input id="title" {...form.register('title')} placeholder="Grandma's tomato pasta" />
-          {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            {...form.register('description')}
-            placeholder="A few words about this dish…"
-          />
-        </div>
-
-        <div className="grid grid-cols-3 gap-3">
+        <Section title="The basics">
           <div className="space-y-2">
-            <Label htmlFor="servings">Servings</Label>
-            <Input id="servings" inputMode="numeric" {...form.register('servings')} />
+            <Label htmlFor="title">Title</Label>
+            <Input id="title" {...form.register('title')} placeholder="Grandma's tomato pasta" />
+            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="prep">Prep (min)</Label>
-            <Input id="prep" inputMode="numeric" {...form.register('prep_time_min')} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cook">Cook (min)</Label>
-            <Input id="cook" inputMode="numeric" {...form.register('cook_time_min')} />
-          </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="tags">Tags</Label>
-          <Input id="tags" {...form.register('tags')} placeholder="dinner, vegetarian, quick" />
-          <p className="text-xs text-muted-foreground">Comma-separated.</p>
-          {tagsQuery.data && tagsQuery.data.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {tagsQuery.data.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => addTag(t.name)}
-                  className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-secondary"
-                >
-                  + {t.name}
-                </button>
-              ))}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              {...form.register('description')}
+              placeholder="A few words about this dish…"
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="servings">Servings</Label>
+              <Input id="servings" inputMode="numeric" {...form.register('servings')} />
+              {errors.servings && (
+                <p className="text-sm text-destructive">{errors.servings.message}</p>
+              )}
             </div>
-          )}
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="prep">Prep (min)</Label>
+              <Input id="prep" inputMode="numeric" {...form.register('prep_time_min')} />
+              {errors.prep_time_min && (
+                <p className="text-sm text-destructive">{errors.prep_time_min.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cook">Cook (min)</Label>
+              <Input id="cook" inputMode="numeric" {...form.register('cook_time_min')} />
+              {errors.cook_time_min && (
+                <p className="text-sm text-destructive">{errors.cook_time_min.message}</p>
+              )}
+            </div>
+          </div>
 
-        <div className="space-y-3">
-          <Label>Ingredients</Label>
+          <div className="space-y-2">
+            <Label htmlFor="tags">Tags</Label>
+            <Input id="tags" {...form.register('tags')} placeholder="dinner, vegetarian, quick" />
+            <p className="text-xs text-muted-foreground">Comma-separated.</p>
+            {tagsQuery.data && tagsQuery.data.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {tagsQuery.data.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => addTag(t.name)}
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    + {t.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </Section>
+
+        <Section title="Ingredients">
           <ul className="space-y-2">
             {ingredients.fields.map((f, idx) => (
               <li key={f.id} className="flex gap-2">
                 <Input
                   placeholder="Qty"
                   className="w-20"
+                  onKeyDown={onIngredientKeyDown(idx)}
                   {...form.register(`ingredients.${idx}.quantity`)}
                 />
                 <Input
                   placeholder="Unit"
                   className="w-24"
+                  onKeyDown={onIngredientKeyDown(idx)}
                   {...form.register(`ingredients.${idx}.unit`)}
                 />
-                <Input placeholder="Ingredient" {...form.register(`ingredients.${idx}.name`)} />
+                <Input
+                  placeholder="Ingredient"
+                  onKeyDown={onIngredientKeyDown(idx)}
+                  {...form.register(`ingredients.${idx}.name`)}
+                />
                 <Button
                   type="button"
                   variant="ghost"
@@ -232,22 +268,26 @@ export function RecipeEditorPage() {
               </li>
             ))}
           </ul>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => ingredients.append({ name: '', quantity: '', unit: '' })}
-          >
-            <Plus /> Add ingredient
-          </Button>
-        </div>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => ingredients.append({ name: '', quantity: '', unit: '' })}
+            >
+              <Plus /> Add ingredient
+            </Button>
+            <p className="hidden text-xs text-muted-foreground sm:block">
+              Enter adds the next ingredient.
+            </p>
+          </div>
+        </Section>
 
-        <div className="space-y-3">
-          <Label>Steps</Label>
+        <Section title="Steps">
           <ol className="space-y-2">
             {steps.fields.map((f, idx) => (
               <li key={f.id} className="flex gap-2">
-                <span className="mt-2.5 w-5 shrink-0 text-right text-sm text-muted-foreground">
+                <span className="num mt-2.5 w-5 shrink-0 text-right text-sm text-muted-foreground">
                   {idx + 1}.
                 </span>
                 <Textarea
@@ -275,25 +315,30 @@ export function RecipeEditorPage() {
           >
             <Plus /> Add step
           </Button>
-        </div>
+        </Section>
 
-        <div className="flex items-center gap-3">
-          <Button type="submit" disabled={save.isPending}>
-            {save.isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create recipe'}
-          </Button>
-          {save.isError && (
-            <p className="text-sm text-destructive">{(save.error as Error).message}</p>
-          )}
+        {/* Floating save bar: the primary action stays in reach on long forms. */}
+        <div className="sticky bottom-4 z-10 flex items-center justify-between gap-3 rounded-2xl border bg-card/95 px-4 py-3 shadow-lift backdrop-blur">
+          <p className="min-w-0 flex-1 truncate text-sm text-destructive">
+            {save.isError ? (save.error as Error).message : ''}
+          </p>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button asChild type="button" variant="ghost">
+              <Link to={backHref}>Cancel</Link>
+            </Button>
+            <Button type="submit" disabled={save.isPending}>
+              {save.isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create recipe'}
+            </Button>
+          </div>
         </div>
       </form>
 
       {isEdit && recipe ? (
-        <section className="space-y-3 border-t pt-6">
-          <h2 className="font-serif text-xl font-semibold">Photos &amp; video</h2>
+        <Section title="Photos & video">
           <MediaManager recipe={recipe} />
-        </section>
+        </Section>
       ) : (
-        <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+        <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
           Save the recipe first, then you can add photos and videos.
         </p>
       )}

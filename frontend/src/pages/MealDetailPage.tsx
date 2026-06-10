@@ -1,11 +1,13 @@
 import { useState } from 'react'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Pencil, Plus, Printer, Trash2, UtensilsCrossed, X } from 'lucide-react'
+import { ArrowLeft, Pencil, Printer, Trash2, UtensilsCrossed, X } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
+import { AddRecipePicker } from '@/components/AddRecipePicker'
 import { ShoppingList } from '@/components/ShoppingList'
 import { Button } from '@/components/ui/button'
+import { ConfirmButton } from '@/components/ui/confirm-button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
@@ -103,17 +105,17 @@ export function MealDetailPage() {
             <Printer />
             <span className="hidden sm:inline">Print</span>
           </Button>
-          <Button
+          <ConfirmButton
             variant="ghost"
             size="sm"
-            className="text-destructive hover:text-destructive"
-            onClick={() => {
-              if (window.confirm(`Delete the meal “${meal.name}”?`)) del.mutate()
-            }}
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+            confirmLabel="Delete meal?"
+            onConfirm={() => del.mutate()}
+            disabled={del.isPending}
           >
             <Trash2 />
             <span className="hidden sm:inline">Delete</span>
-          </Button>
+          </ConfirmButton>
         </div>
       </div>
 
@@ -203,27 +205,7 @@ export function MealDetailPage() {
           </ul>
         )}
 
-        <label className="relative flex items-center">
-          <Plus className="pointer-events-none absolute left-3 size-4 text-muted-foreground" />
-          <select
-            value=""
-            disabled={available.length === 0 || save.isPending}
-            onChange={(e) => {
-              const rid = Number(e.target.value)
-              if (rid) addRecipe(rid)
-            }}
-            className="h-10 w-full appearance-none rounded-lg border border-border bg-card/40 pl-9 pr-3 text-sm transition-colors hover:bg-secondary disabled:opacity-50"
-          >
-            <option value="">
-              {available.length === 0 ? 'All recipes are in this meal' : 'Add a recipe…'}
-            </option>
-            {available.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.title}
-              </option>
-            ))}
-          </select>
-        </label>
+        <AddRecipePicker recipes={available} onAdd={addRecipe} disabled={save.isPending} />
       </section>
 
       <section className="space-y-3">

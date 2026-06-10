@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import { Check, RotateCcw } from 'lucide-react'
+
 import type { AggregatedIngredient } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
@@ -27,48 +29,68 @@ export function ShoppingList({ items }: { items: AggregatedIngredient[] }) {
   }
 
   return (
-    <ul className="divide-y rounded-2xl border bg-card shadow-card">
-      {items.map((item, i) => {
-        const isChecked = checked.has(i)
-        return (
-          <li key={`${item.name}-${item.unit ?? ''}`}>
-            <button
-              type="button"
-              onClick={() => toggle(i)}
-              className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/50"
-            >
-              <span
-                className={cn(
-                  'flex size-5 shrink-0 items-center justify-center rounded border-2 text-[10px] font-bold transition-colors',
-                  isChecked
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border text-transparent',
-                )}
+    <div className="space-y-2">
+      <div className="flex h-5 items-center justify-between text-sm text-muted-foreground print:hidden">
+        <span className="num" aria-live="polite">
+          {checked.size} of {items.length} gathered
+        </span>
+        {checked.size > 0 && (
+          <button
+            type="button"
+            onClick={() => setChecked(new Set())}
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+          >
+            <RotateCcw className="size-3.5" />
+            Reset
+          </button>
+        )}
+      </div>
+      <ul className="divide-y rounded-2xl border bg-card shadow-card">
+        {items.map((item, i) => {
+          const isChecked = checked.has(i)
+          return (
+            <li key={`${item.name}-${item.unit ?? ''}`}>
+              <button
+                type="button"
+                onClick={() => toggle(i)}
+                aria-pressed={isChecked}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/50"
               >
-                ✓
-              </span>
-              <span className={cn('min-w-0 flex-1', isChecked && 'text-muted-foreground line-through')}>
-                <span className="font-medium">{item.name}</span>
-                {item.recipe_count > 1 && (
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    from {item.recipe_count} recipes
-                  </span>
-                )}
-              </span>
-              {(item.quantity || item.unit) && (
                 <span
                   className={cn(
-                    'num shrink-0 text-sm text-muted-foreground',
-                    isChecked && 'line-through',
+                    'flex size-5 shrink-0 items-center justify-center rounded border-2 transition-colors',
+                    isChecked
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border',
                   )}
                 >
-                  {[item.quantity, item.unit].filter(Boolean).join(' ')}
+                  {isChecked && <Check className="size-3.5" />}
                 </span>
-              )}
-            </button>
-          </li>
-        )
-      })}
-    </ul>
+                <span
+                  className={cn('min-w-0 flex-1', isChecked && 'text-muted-foreground line-through')}
+                >
+                  <span className="font-medium">{item.name}</span>
+                  {item.recipe_count > 1 && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      from {item.recipe_count} recipes
+                    </span>
+                  )}
+                </span>
+                {(item.quantity || item.unit) && (
+                  <span
+                    className={cn(
+                      'num shrink-0 text-sm text-muted-foreground',
+                      isChecked && 'line-through',
+                    )}
+                  >
+                    {[item.quantity, item.unit].filter(Boolean).join(' ')}
+                  </span>
+                )}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
   )
 }

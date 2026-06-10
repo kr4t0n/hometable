@@ -63,6 +63,11 @@ export function RecipeListPage() {
     setMealName('')
   }
 
+  const clearFilters = () => {
+    setSearch('')
+    setSelectedTags([])
+  }
+
   const saveMeal = useMutation({
     mutationFn: () => api.createMeal({ name: mealName.trim(), recipe_ids: selectedIds }),
     onSuccess: (meal) => {
@@ -106,8 +111,9 @@ export function RecipeListPage() {
         </div>
       </header>
 
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-1 flex-wrap gap-2">
+      {/* Toolbar: filters read left-to-right, controls gather on the right. */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-1 flex-wrap items-center gap-2">
           {tagsQuery.data?.map((t) => {
             const active = selectedTags.includes(t.name)
             return (
@@ -115,6 +121,7 @@ export function RecipeListPage() {
                 key={t.id}
                 type="button"
                 onClick={() => toggleTag(t.name)}
+                aria-pressed={active}
                 className={cn(
                   'rounded-full border px-3 py-1 text-sm transition-colors',
                   active
@@ -126,41 +133,58 @@ export function RecipeListPage() {
               </button>
             )
           })}
-        </div>
-        <Button
-          type="button"
-          variant={selecting ? 'default' : 'outline'}
-          size="sm"
-          onClick={toggleSelecting}
-          className="shrink-0 rounded-full"
-          aria-pressed={selecting}
-        >
-          <ListChecks />
-          <span className="hidden sm:inline">{selecting ? 'Cancel' : 'Plan a meal'}</span>
-        </Button>
-        <div className="inline-flex shrink-0 items-center rounded-full border bg-card p-0.5">
-          {(
-            [
-              ['grid', LayoutGrid, 'Grid view'],
-              ['list', List, 'List view'],
-            ] as const
-          ).map(([key, Icon, label]) => (
+          {selectedTags.length > 0 && (
             <button
-              key={key}
               type="button"
-              aria-label={label}
-              aria-pressed={view === key}
-              onClick={() => setView(key)}
-              className={cn(
-                'flex size-8 items-center justify-center rounded-full transition-colors',
-                view === key
-                  ? 'bg-secondary text-foreground'
-                  : 'text-muted-foreground hover:text-foreground',
-              )}
+              onClick={() => setSelectedTags([])}
+              className="inline-flex items-center gap-1 px-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
-              <Icon className="size-4" />
+              <X className="size-3.5" />
+              Clear
             </button>
-          ))}
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          {data && (
+            <span className="num text-sm text-muted-foreground">
+              {data.length} {data.length === 1 ? 'recipe' : 'recipes'}
+            </span>
+          )}
+          <div className="inline-flex shrink-0 items-center rounded-full border bg-card p-0.5">
+            {(
+              [
+                ['grid', LayoutGrid, 'Grid view'],
+                ['list', List, 'List view'],
+              ] as const
+            ).map(([key, Icon, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-label={label}
+                aria-pressed={view === key}
+                onClick={() => setView(key)}
+                className={cn(
+                  'flex size-8 items-center justify-center rounded-full transition-colors',
+                  view === key
+                    ? 'bg-secondary text-foreground'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                <Icon className="size-4" />
+              </button>
+            ))}
+          </div>
+          <Button
+            type="button"
+            variant={selecting ? 'secondary' : 'outline'}
+            size="sm"
+            onClick={toggleSelecting}
+            className="shrink-0 rounded-full"
+            aria-pressed={selecting}
+          >
+            {selecting ? <X /> : <ListChecks />}
+            <span className="hidden sm:inline">{selecting ? 'Cancel' : 'Plan a meal'}</span>
+          </Button>
         </div>
       </div>
 
@@ -170,16 +194,16 @@ export function RecipeListPage() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="overflow-hidden rounded-2xl border bg-card shadow-card">
                 <Skeleton className="aspect-[4/3] rounded-none" />
-                <div className="space-y-3 p-4">
+                <div className="flex h-40 flex-col p-4">
                   <Skeleton className="h-5 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="mt-2 h-4 w-full" />
+                  <Skeleton className="mt-auto h-4 w-1/3" />
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="mx-auto max-w-3xl space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -206,7 +230,11 @@ export function RecipeListPage() {
           <p className="mb-5 text-sm text-muted-foreground">
             {hasFilters ? 'Try a different search or tag.' : 'Add your first recipe to get started.'}
           </p>
-          {!hasFilters && (
+          {hasFilters ? (
+            <Button variant="outline" onClick={clearFilters}>
+              <X /> Clear filters
+            </Button>
+          ) : (
             <Button asChild>
               <Link to="/recipes/new">
                 <Plus /> New recipe
@@ -244,7 +272,7 @@ export function RecipeListPage() {
         ))}
 
       {selecting && (
-        <div className="sticky bottom-4 z-20 mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card/95 px-4 py-3 shadow-lift backdrop-blur">
+        <div className="sticky bottom-4 z-20 mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card/95 px-4 py-3 shadow-lift backdrop-blur duration-300 animate-in fade-in slide-in-from-bottom-4">
           {naming ? (
             <form
               className="flex w-full items-center gap-2"
@@ -269,7 +297,7 @@ export function RecipeListPage() {
             </form>
           ) : (
             <>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground" aria-live="polite">
                 {selectedIds.length === 0 ? (
                   'Select recipes to combine into a shopping list.'
                 ) : (

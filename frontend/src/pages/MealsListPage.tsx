@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { CalendarDays, ChefHat, UtensilsCrossed } from 'lucide-react'
+import { CalendarDays, ChefHat } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
@@ -71,7 +71,7 @@ export function MealsListPage() {
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-muted-foreground/50">
-                      <UtensilsCrossed className="size-9" />
+                      <CalendarDays className="size-9" />
                     </div>
                   )}
                 </div>

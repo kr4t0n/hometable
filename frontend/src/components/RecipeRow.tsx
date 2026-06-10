@@ -63,12 +63,10 @@ export function RecipeRow({ recipe, selectable, selected, onToggleSelect }: Reci
         <span
           className={cn(
             'mr-1 flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
-            selected
-              ? 'border-primary bg-primary text-primary-foreground'
-              : 'border-border text-transparent',
+            selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border',
           )}
         >
-          <Check className="size-4" />
+          {selected && <Check className="size-4" />}
         </span>
       )}
     </article>

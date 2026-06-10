@@ -15,8 +15,11 @@ Postgres database and S3-compatible object store, not a third-party service.
 ## Features
 
 - **Recipes** with ingredients, steps, servings, prep/cook times, and tags/categories.
-- **Photos & video** per recipe (direct-to-S3 uploads, plus YouTube/Vimeo embeds).
+- **Photos & video** per recipe (drag-and-drop direct-to-S3 uploads, plus YouTube/Vimeo embeds).
 - **Search & filter** by name, ingredient, and tag; grid or list views.
+- **Built for cooking from.** On a recipe page you can scale quantities by servings, tick off
+  ingredients as you gather them, and tap step numbers to track where you are (all local to the
+  visit, nothing saved). Shopping lists show "x of y gathered" progress and print cleanly.
 - **Plan a meal → shopping list.** A meal is several recipes, so select the recipes that make it
   up and hometable combines their ingredients into one list — quantities with the same name + unit
   are summed (it understands `2`, `1/2`, `1 1/2`, `1.5`), and free-text amounts like "a pinch" are
