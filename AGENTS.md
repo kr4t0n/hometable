@@ -38,8 +38,11 @@ object store handle range requests (video seeking) natively.
   optional quick-start and is used for fast unit tests.
 - **Two deploy targets.** Docker Compose bundles Postgres + MinIO for dev/CI. The Helm chart ships
   only the app and points at **external** Postgres + MinIO (existing infra).
-- **Design system: "Warm Cookbook."** Terracotta/sage/cream palette, Fraunces + Inter (self-hosted
-  fonts), shadcn/ui components vendored in-repo. Tokens are CSS variables so dark mode is cheap.
+- **Design system: "Evergreen Bistro."** Bottle-green primary with plum and saffron accents on
+  buttery parchment (dark mode: green-tinted charcoal), Fraunces + Inter (self-hosted fonts),
+  shadcn/ui components vendored in-repo. Tokens are CSS variables in `src/index.css`, so a palette
+  swap touches only that file (plus the shadow tint in `tailwind.config.ts`). Replaced the
+  original terracotta "Warm Cookbook" palette.
 
 ## Module responsibilities (backend)
 
