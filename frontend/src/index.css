@@ -3,54 +3,54 @@
 @tailwind utilities;
 
 @layer base {
-  /* "Slate & Copper": slate blue + copper on warm linen — calm, modern kitchen. */
+  /* "Espresso & Caramel": deep coffee brown + caramel gold on latte cream — cozy café. */
   :root {
-    --background: 40 18% 96%; /* warm linen (kept warm so food photos read well) */
-    --foreground: 215 18% 15%; /* slate ink */
-    --card: 40 25% 99%;
-    --card-foreground: 215 18% 15%;
-    --popover: 40 25% 99%;
-    --popover-foreground: 215 18% 15%;
-    --primary: 214 32% 38%; /* slate blue (#42597F) */
-    --primary-foreground: 40 30% 98%;
-    --secondary: 38 16% 90%; /* warm greige */
-    --secondary-foreground: 215 18% 18%;
-    --muted: 38 14% 92%;
-    --muted-foreground: 220 8% 42%;
-    --accent: 22 60% 40%; /* copper (tags) */
-    --accent-foreground: 40 30% 98%;
-    --honey: 36 60% 46%; /* amber — tertiary warmth */
+    --background: 38 35% 96%; /* steamed-milk cream */
+    --foreground: 24 20% 13%; /* espresso ink */
+    --card: 40 45% 99%;
+    --card-foreground: 24 20% 13%;
+    --popover: 40 45% 99%;
+    --popover-foreground: 24 20% 13%;
+    --primary: 25 32% 25%; /* espresso (#543C2B) */
+    --primary-foreground: 38 40% 97%;
+    --secondary: 36 28% 89%; /* oat-milk latte */
+    --secondary-foreground: 24 20% 18%;
+    --muted: 36 24% 92%;
+    --muted-foreground: 28 12% 40%;
+    --accent: 33 65% 38%; /* caramel (tags) */
+    --accent-foreground: 38 40% 97%;
+    --honey: 40 70% 50%; /* golden honey — tertiary warmth */
     --honey-foreground: 26 30% 14%;
-    --destructive: 2 62% 46%;
-    --destructive-foreground: 40 30% 98%;
-    --border: 36 14% 86%;
-    --input: 36 14% 82%;
-    --ring: 214 32% 38%;
+    --destructive: 4 62% 46%;
+    --destructive-foreground: 38 40% 97%;
+    --border: 35 22% 86%;
+    --input: 35 22% 82%;
+    --ring: 25 32% 25%;
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 218 16% 9%; /* slate night */
-    --foreground: 36 18% 89%;
-    --card: 218 14% 13%;
-    --card-foreground: 36 18% 89%;
-    --popover: 218 14% 13%;
-    --popover-foreground: 36 18% 89%;
-    --primary: 214 45% 66%; /* soft denim, lifted for dark contrast */
-    --primary-foreground: 218 30% 9%;
-    --secondary: 218 10% 19%;
-    --secondary-foreground: 36 18% 89%;
-    --muted: 218 10% 17%;
-    --muted-foreground: 220 10% 62%;
-    --accent: 24 60% 58%;
-    --accent-foreground: 24 30% 10%;
-    --honey: 36 55% 56%;
+    --background: 24 16% 8%; /* closing-time espresso bar */
+    --foreground: 36 24% 89%;
+    --card: 24 14% 12%;
+    --card-foreground: 36 24% 89%;
+    --popover: 24 14% 12%;
+    --popover-foreground: 36 24% 89%;
+    --primary: 34 45% 66%; /* creamy latte, lifted for dark contrast */
+    --primary-foreground: 26 30% 9%;
+    --secondary: 26 10% 19%;
+    --secondary-foreground: 36 24% 89%;
+    --muted: 26 10% 17%;
+    --muted-foreground: 32 12% 62%;
+    --accent: 30 60% 55%;
+    --accent-foreground: 26 30% 10%;
+    --honey: 40 60% 56%;
     --honey-foreground: 26 30% 10%;
-    --destructive: 2 58% 54%;
-    --destructive-foreground: 36 18% 92%;
-    --border: 218 10% 21%;
-    --input: 218 10% 25%;
-    --ring: 214 45% 66%;
+    --destructive: 4 58% 54%;
+    --destructive-foreground: 36 24% 92%;
+    --border: 26 10% 21%;
+    --input: 26 10% 25%;
+    --ring: 34 45% 66%;
   }
 }
 
