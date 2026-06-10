@@ -33,7 +33,7 @@ export function Layout() {
                     cn(
                       'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
                       isActive
-                        ? 'bg-secondary text-foreground'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
                         : 'text-muted-foreground hover:text-foreground',
                     )
                   }

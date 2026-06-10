@@ -338,7 +338,7 @@ export function RecipeEditorPage() {
           <MediaManager recipe={recipe} />
         </Section>
       ) : (
-        <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+        <p className="rounded-xl border border-dashed bg-primary/5 p-4 text-sm text-muted-foreground">
           Save the recipe first, then you can add photos and videos.
         </p>
       )}

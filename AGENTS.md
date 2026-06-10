@@ -39,14 +39,18 @@ object store handle range requests (video seeking) natively.
 - **Two deploy targets.** Docker Compose bundles Postgres + MinIO for dev/CI. The Helm chart ships
   only the app and points at **external** Postgres + MinIO (existing infra).
 - **Design system: "Apricot Cream."** Built around the brand color `#F1D9C3`, used as the
-  **action color**: `--primary` is the apricot itself (buttons, active chips, checkboxes, logo
-  chip) with cocoa text on it, sitting on a quiet warm-cream canvas. Because the primary is light,
-  it must never be used *as text* — burnt sienna (`--accent`) carries text emphasis (eyebrow
-  labels, icons, hover titles, step-number outlines), and `--ring` is cocoa so focus rings stay
-  visible. Dark mode is cocoa-night charcoal with the same apricot primary. Fraunces + Inter
-  (self-hosted fonts), shadcn/ui components vendored in-repo. Tokens are CSS variables in
-  `src/index.css`. Earlier palettes in git history: terracotta "Warm Cookbook" (original), green
-  "Evergreen Bistro" (reverted), plum "Fig & Honey", "Slate & Copper", "Espresso & Caramel".
+  **action color**: `--primary` is the apricot itself (buttons, active nav pill, view toggle,
+  active filter chips, checkboxes, logo chip) with cocoa text on it, sitting on a quiet warm-cream
+  canvas. Supporting surfaces are deliberately in the same family for consistency: `--secondary`/
+  `--muted` are soft apricot tints, borders are apricot-warmed, tag badges are translucent apricot
+  pills (`bg-primary/25 border-primary/40`), and empty states get a faint `bg-primary/5` wash.
+  Because the primary is light, it must never be used *as text* — burnt sienna (`--accent`)
+  carries text emphasis (eyebrow labels, icons, hover titles, step-number outlines), and `--ring`
+  is cocoa so focus rings stay visible. Dark mode is cocoa-night charcoal with the same apricot
+  primary. Fraunces + Inter (self-hosted fonts), shadcn/ui components vendored in-repo. Tokens are
+  CSS variables in `src/index.css`. Earlier palettes in git history: terracotta "Warm Cookbook"
+  (original), green "Evergreen Bistro" (reverted), plum "Fig & Honey", "Slate & Copper",
+  "Espresso & Caramel".
 
 ## Module responsibilities (backend)
 

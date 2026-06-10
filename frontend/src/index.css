@@ -16,18 +16,18 @@
     --popover-foreground: 22 28% 14%;
     --primary: 29 62% 86%; /* apricot (#F1D9C3) — the button color */
     --primary-foreground: 22 35% 16%;
-    --secondary: 29 50% 91%;
+    --secondary: 29 60% 92%; /* soft apricot — hover fills, secondary buttons */
     --secondary-foreground: 22 28% 18%;
-    --muted: 29 40% 92%;
+    --muted: 30 45% 93%;
     --muted-foreground: 25 16% 39%;
-    --accent: 16 55% 40%; /* burnt sienna (tags + text emphasis) */
+    --accent: 16 55% 40%; /* burnt sienna (text emphasis) */
     --accent-foreground: 30 60% 97%;
     --honey: 38 70% 48%; /* golden amber — tertiary warmth */
     --honey-foreground: 26 30% 14%;
     --destructive: 358 60% 44%;
     --destructive-foreground: 30 60% 97%;
-    --border: 28 26% 86%;
-    --input: 28 26% 80%;
+    --border: 28 35% 85%; /* apricot-warmed hairlines */
+    --input: 28 35% 79%;
     --ring: 22 45% 30%; /* cocoa — apricot is too light for focus rings */
     --radius: 0.75rem;
   }
@@ -41,9 +41,9 @@
     --popover-foreground: 32 30% 90%;
     --primary: 29 62% 86%; /* #F1D9C3 — same button color at night */
     --primary-foreground: 22 30% 12%;
-    --secondary: 24 10% 19%;
+    --secondary: 26 14% 19%;
     --secondary-foreground: 32 30% 90%;
-    --muted: 24 10% 17%;
+    --muted: 26 14% 17%;
     --muted-foreground: 30 12% 64%;
     --accent: 18 55% 60%;
     --accent-foreground: 22 30% 10%;
@@ -51,8 +51,8 @@
     --honey-foreground: 26 30% 10%;
     --destructive: 358 56% 54%;
     --destructive-foreground: 32 30% 92%;
-    --border: 24 10% 21%;
-    --input: 24 10% 25%;
+    --border: 26 14% 22%;
+    --input: 26 14% 26%;
     --ring: 29 62% 86%;
   }
 }

@@ -166,7 +166,7 @@ export function RecipeListPage() {
                 className={cn(
                   'flex size-8 items-center justify-center rounded-full transition-colors',
                   view === key
-                    ? 'bg-secondary text-foreground'
+                    ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >
@@ -223,7 +223,7 @@ export function RecipeListPage() {
         <p className="text-destructive">Failed to load recipes: {(error as Error).message}</p>
       )}
       {data && data.length === 0 && (
-        <div className="rounded-2xl border border-dashed py-20 text-center">
+        <div className="rounded-2xl border border-dashed bg-primary/5 py-20 text-center">
           <p className="mb-1 font-serif text-xl">
             {hasFilters ? 'Nothing matches yet' : 'Your cookbook is empty'}
           </p>

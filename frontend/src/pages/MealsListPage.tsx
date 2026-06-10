@@ -41,7 +41,7 @@ export function MealsListPage() {
       )}
 
       {data && data.length === 0 && (
-        <div className="rounded-2xl border border-dashed py-20 text-center">
+        <div className="rounded-2xl border border-dashed bg-primary/5 py-20 text-center">
           <CalendarDays className="mx-auto mb-3 size-8 text-muted-foreground/50" />
           <p className="mb-1 font-serif text-xl">No meals planned yet</p>
           <p className="mb-5 text-sm text-muted-foreground">

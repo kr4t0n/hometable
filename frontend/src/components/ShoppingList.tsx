@@ -19,7 +19,7 @@ export function ShoppingList({ items }: { items: AggregatedIngredient[] }) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed py-16 text-center">
+      <div className="rounded-2xl border border-dashed bg-primary/5 py-16 text-center">
         <p className="mb-1 font-serif text-xl">No ingredients to gather</p>
         <p className="text-sm text-muted-foreground">
           These recipes don’t list any ingredients yet.
