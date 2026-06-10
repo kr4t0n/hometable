@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss'
 import animate from 'tailwindcss-animate'
 
-// "Warm Cookbook" design system. Color values live as CSS variables in src/index.css
+// "Fig & Honey" design system. Color values live as CSS variables in src/index.css
 // (light + dark); here we map them to Tailwind color tokens.
 export default {
   darkMode: ['class'],
@@ -46,10 +46,10 @@ export default {
         sm: 'calc(var(--radius) - 4px)',
       },
       boxShadow: {
-        // Warm, layered shadows (brown-tinted, not neutral grey).
-        sm: '0 1px 2px 0 rgb(40 28 18 / 0.05)',
-        card: '0 1px 2px rgb(40 28 18 / 0.04), 0 12px 28px -16px rgb(40 28 18 / 0.18)',
-        lift: '0 2px 6px rgb(40 28 18 / 0.06), 0 22px 44px -22px rgb(40 28 18 / 0.30)',
+        // Layered shadows tinted toward plum ink, not neutral grey.
+        sm: '0 1px 2px 0 rgb(36 24 34 / 0.05)',
+        card: '0 1px 2px rgb(36 24 34 / 0.04), 0 12px 28px -16px rgb(36 24 34 / 0.18)',
+        lift: '0 2px 6px rgb(36 24 34 / 0.06), 0 22px 44px -22px rgb(36 24 34 / 0.30)',
       },
       fontSize: {
         // Tightened display sizes with editorial leading.

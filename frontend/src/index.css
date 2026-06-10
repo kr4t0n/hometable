@@ -3,53 +3,54 @@
 @tailwind utilities;
 
 @layer base {
+  /* "Fig & Honey": deep fig plum, honey gold & copper on blush parchment. */
   :root {
-    --background: 36 38% 96%; /* warm paper */
-    --foreground: 24 16% 14%; /* espresso ink */
-    --card: 40 56% 99%;
-    --card-foreground: 24 16% 14%;
-    --popover: 40 56% 99%;
-    --popover-foreground: 24 16% 14%;
-    --primary: 13 64% 57%; /* terracotta (#D76A4B) */
-    --primary-foreground: 38 50% 98%;
-    --secondary: 36 30% 90%; /* warm sand */
-    --secondary-foreground: 24 16% 20%;
-    --muted: 36 26% 92%;
-    --muted-foreground: 28 10% 40%;
-    --accent: 92 16% 40%; /* herb / sage */
-    --accent-foreground: 40 50% 98%;
-    --honey: 36 64% 50%; /* tertiary warmth */
-    --honey-foreground: 24 30% 14%;
-    --destructive: 8 60% 46%;
-    --destructive-foreground: 38 50% 98%;
-    --border: 34 26% 87%;
-    --input: 34 24% 83%;
-    --ring: 13 64% 57%;
+    --background: 32 33% 96%; /* blush parchment */
+    --foreground: 320 10% 14%; /* plum ink */
+    --card: 36 45% 99%;
+    --card-foreground: 320 10% 14%;
+    --popover: 36 45% 99%;
+    --popover-foreground: 320 10% 14%;
+    --primary: 318 32% 36%; /* fig / aubergine (#793E68) */
+    --primary-foreground: 36 45% 97%;
+    --secondary: 24 24% 90%; /* rosy sand */
+    --secondary-foreground: 320 10% 18%;
+    --muted: 26 22% 92%;
+    --muted-foreground: 320 6% 40%;
+    --accent: 38 58% 36%; /* honey gold (tags) */
+    --accent-foreground: 36 45% 97%;
+    --honey: 25 60% 46%; /* copper — tertiary warmth */
+    --honey-foreground: 20 30% 14%;
+    --destructive: 4 64% 46%;
+    --destructive-foreground: 36 45% 97%;
+    --border: 28 20% 86%;
+    --input: 28 20% 82%;
+    --ring: 318 32% 36%;
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 26 14% 9%; /* warm charcoal */
-    --foreground: 38 28% 90%;
-    --card: 26 12% 13%;
-    --card-foreground: 38 28% 90%;
-    --popover: 26 12% 13%;
-    --popover-foreground: 38 28% 90%;
-    --primary: 13 64% 57%;
-    --primary-foreground: 26 24% 10%;
-    --secondary: 28 9% 20%;
-    --secondary-foreground: 38 28% 90%;
-    --muted: 28 9% 18%;
-    --muted-foreground: 34 12% 62%;
-    --accent: 92 18% 54%;
-    --accent-foreground: 26 24% 10%;
-    --honey: 36 58% 56%;
-    --honey-foreground: 26 30% 10%;
-    --destructive: 8 58% 53%;
-    --destructive-foreground: 38 28% 92%;
-    --border: 28 9% 22%;
-    --input: 28 9% 24%;
-    --ring: 13 64% 57%;
+    --background: 315 12% 9%; /* late-night plum charcoal */
+    --foreground: 30 25% 90%;
+    --card: 315 10% 13%;
+    --card-foreground: 30 25% 90%;
+    --popover: 315 10% 13%;
+    --popover-foreground: 30 25% 90%;
+    --primary: 318 32% 64%; /* orchid, lifted for dark contrast */
+    --primary-foreground: 318 25% 10%;
+    --secondary: 315 7% 20%;
+    --secondary-foreground: 30 25% 90%;
+    --muted: 315 7% 18%;
+    --muted-foreground: 320 8% 62%;
+    --accent: 40 55% 58%;
+    --accent-foreground: 35 30% 10%;
+    --honey: 28 55% 58%;
+    --honey-foreground: 20 30% 10%;
+    --destructive: 4 60% 54%;
+    --destructive-foreground: 30 25% 92%;
+    --border: 315 7% 22%;
+    --input: 315 7% 26%;
+    --ring: 318 32% 64%;
   }
 }
 
