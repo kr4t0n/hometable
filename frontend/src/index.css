@@ -3,54 +3,55 @@
 @tailwind utilities;
 
 @layer base {
-  /* "Espresso & Caramel": deep coffee brown + caramel gold on latte cream — cozy café. */
+  /* "Apricot Cream": built around #F1D9C3 — apricot canvas, warm-white cards,
+     toasted cocoa primary. In dark mode #F1D9C3 itself becomes the primary. */
   :root {
-    --background: 38 35% 96%; /* steamed-milk cream */
-    --foreground: 24 20% 13%; /* espresso ink */
-    --card: 40 45% 99%;
-    --card-foreground: 24 20% 13%;
-    --popover: 40 45% 99%;
-    --popover-foreground: 24 20% 13%;
-    --primary: 25 32% 25%; /* espresso (#543C2B) */
-    --primary-foreground: 38 40% 97%;
-    --secondary: 36 28% 89%; /* oat-milk latte */
-    --secondary-foreground: 24 20% 18%;
-    --muted: 36 24% 92%;
-    --muted-foreground: 28 12% 40%;
-    --accent: 33 65% 38%; /* caramel (tags) */
-    --accent-foreground: 38 40% 97%;
-    --honey: 40 70% 50%; /* golden honey — tertiary warmth */
+    --background: 29 62% 86%; /* apricot cream (#F1D9C3) */
+    --foreground: 22 28% 14%; /* cocoa ink */
+    --card: 30 60% 98%;
+    --card-foreground: 22 28% 14%;
+    --popover: 30 60% 98%;
+    --popover-foreground: 22 28% 14%;
+    --primary: 22 45% 30%; /* toasted cocoa (#6F432A) */
+    --primary-foreground: 30 60% 97%;
+    --secondary: 29 55% 91%; /* lighter apricot for fills on cards */
+    --secondary-foreground: 22 28% 18%;
+    --muted: 29 45% 92%;
+    --muted-foreground: 25 18% 38%;
+    --accent: 16 55% 40%; /* burnt sienna (tags) */
+    --accent-foreground: 30 60% 97%;
+    --honey: 38 70% 48%; /* golden amber — tertiary warmth */
     --honey-foreground: 26 30% 14%;
-    --destructive: 4 62% 46%;
-    --destructive-foreground: 38 40% 97%;
-    --border: 35 22% 86%;
-    --input: 35 22% 82%;
-    --ring: 25 32% 25%;
+    --destructive: 358 60% 44%;
+    --destructive-foreground: 30 60% 97%;
+    --border: 28 30% 78%;
+    --input: 28 30% 74%;
+    --ring: 22 45% 30%;
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 24 16% 8%; /* closing-time espresso bar */
-    --foreground: 36 24% 89%;
-    --card: 24 14% 12%;
-    --card-foreground: 36 24% 89%;
-    --popover: 24 14% 12%;
-    --popover-foreground: 36 24% 89%;
-    --primary: 34 45% 66%; /* creamy latte, lifted for dark contrast */
-    --primary-foreground: 26 30% 9%;
-    --secondary: 26 10% 19%;
-    --secondary-foreground: 36 24% 89%;
-    --muted: 26 10% 17%;
-    --muted-foreground: 32 12% 62%;
-    --accent: 30 60% 55%;
-    --accent-foreground: 26 30% 10%;
-    --honey: 40 60% 56%;
+    --background: 22 18% 9%; /* cocoa night */
+    --foreground: 32 30% 90%;
+    --card: 22 16% 13%;
+    --card-foreground: 32 30% 90%;
+    --popover: 22 16% 13%;
+    --popover-foreground: 32 30% 90%;
+    --primary: 29 62% 86%; /* #F1D9C3 — the apricot takes the lead at night */
+    --primary-foreground: 22 30% 12%;
+    --secondary: 24 10% 19%;
+    --secondary-foreground: 32 30% 90%;
+    --muted: 24 10% 17%;
+    --muted-foreground: 30 12% 64%;
+    --accent: 18 55% 60%;
+    --accent-foreground: 22 30% 10%;
+    --honey: 38 60% 56%;
     --honey-foreground: 26 30% 10%;
-    --destructive: 4 58% 54%;
-    --destructive-foreground: 36 24% 92%;
-    --border: 26 10% 21%;
-    --input: 26 10% 25%;
-    --ring: 34 45% 66%;
+    --destructive: 358 56% 54%;
+    --destructive-foreground: 32 30% 92%;
+    --border: 24 10% 21%;
+    --input: 24 10% 25%;
+    --ring: 29 62% 86%;
   }
 }
 

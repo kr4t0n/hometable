@@ -1,8 +1,8 @@
 import type { Config } from 'tailwindcss'
 import animate from 'tailwindcss-animate'
 
-// "Espresso & Caramel" design system. Color values live as CSS variables in src/index.css
-// (light + dark); here we map them to Tailwind color tokens.
+// "Apricot Cream" design system (built around #F1D9C3). Color values live as CSS
+// variables in src/index.css (light + dark); here we map them to Tailwind color tokens.
 export default {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{ts,tsx}'],
@@ -46,10 +46,10 @@ export default {
         sm: 'calc(var(--radius) - 4px)',
       },
       boxShadow: {
-        // Layered shadows tinted toward espresso ink, not neutral grey.
-        sm: '0 1px 2px 0 rgb(42 30 20 / 0.05)',
-        card: '0 1px 2px rgb(42 30 20 / 0.04), 0 12px 28px -16px rgb(42 30 20 / 0.18)',
-        lift: '0 2px 6px rgb(42 30 20 / 0.06), 0 22px 44px -22px rgb(42 30 20 / 0.30)',
+        // Layered shadows tinted toward cocoa ink, not neutral grey.
+        sm: '0 1px 2px 0 rgb(44 30 22 / 0.05)',
+        card: '0 1px 2px rgb(44 30 22 / 0.05), 0 12px 28px -16px rgb(44 30 22 / 0.22)',
+        lift: '0 2px 6px rgb(44 30 22 / 0.07), 0 22px 44px -22px rgb(44 30 22 / 0.34)',
       },
       fontSize: {
         // Tightened display sizes with editorial leading.
