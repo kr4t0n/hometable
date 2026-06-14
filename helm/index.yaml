@@ -3,10 +3,10 @@ entries:
   hometable:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2026-06-14T15:34:17.180507878Z"
+    created: "2026-06-14T15:53:08.716827245Z"
     description: Self-hosted recipe menu book (FastAPI + React) — connects to EXTERNAL
       Postgres + MinIO
-    digest: 9b5c2923267b9773340e477d486857a175aa3d0b8e1bbe36698859b5e6c106fc
+    digest: 96f53476e836676c315f499de17cb923803b9d226fc67ee08c4b83ccc5e16ddf
     home: https://github.com/kr4t0n/hometable
     keywords:
     - recipes
@@ -19,4 +19,4 @@ entries:
     urls:
     - https://kr4t0n.github.io/hometable/helm/hometable-0.1.0.tgz
     version: 0.1.0
-generated: "2026-06-14T15:34:17.179918127Z"
+generated: "2026-06-14T15:53:08.71631231Z"
