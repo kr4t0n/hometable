@@ -120,6 +120,40 @@ hometable/
 └── deploy/helm/hometable/ # Helm chart for k8s (external Postgres + MinIO)
 ```
 
+## CI / CD (GitHub Actions)
+
+Three workflows under `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `ci.yml` | push to `main`, all PRs | Backend: `ruff check` + `ruff format --check` + `pytest`. Frontend: `eslint` + `tsc --noEmit` + `vite build`. |
+| `docker-publish.yml` | push to `main`, `v*` tags, PRs (build-only), manual | Builds **multi-arch** (`linux/amd64` + `linux/arm64`, native runners) images for `kr4t0n/hometable-backend` and `kr4t0n/hometable-frontend` and pushes one manifest list per tag to Docker Hub. |
+| `helm-publish.yml` | push to `main` touching `deploy/helm/**`, manual | Packages the chart and publishes it to the `gh-pages` branch as a Helm repo at `https://kr4t0n.github.io/hometable/helm`. |
+
+**Required repo secrets:** `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (already configured).
+
+**Image tags:** pushes to `main` publish `:latest`, `:main`, `:sha-<short>`. A `vX.Y.Z` git tag
+additionally publishes `:X.Y.Z`, `:X.Y`, and `:latest`. PRs build both images as a smoke test but
+don't push.
+
+**Cutting a release:**
+
+1. Bump `version` **and** `appVersion` in `deploy/helm/hometable/Chart.yaml` to `X.Y.Z`.
+2. Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+The tag builds `kr4t0n/hometable-{backend,frontend}:X.Y.Z`; merging the Chart bump to `main`
+publishes a chart whose default image tag (via `appVersion`) resolves to those exact images. Using
+the published chart:
+
+```bash
+helm repo add hometable https://kr4t0n.github.io/hometable/helm
+helm repo update
+helm upgrade --install hometable hometable/hometable -f my-values.yaml
+```
+
+> First-time setup: after the first `helm-publish` run creates the `gh-pages` branch, enable
+> GitHub Pages (repo **Settings → Pages**, source = `gh-pages` branch) so the repo is served.
+
 ## Deployment
 
 - **Dev / CI** → Docker Compose (this repo's `docker-compose.yml`).

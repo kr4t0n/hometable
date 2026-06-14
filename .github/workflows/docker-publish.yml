@@ -1,0 +1,241 @@
+name: docker-publish
+
+# Builds the hometable backend (FastAPI) and frontend (nginx-served SPA) images
+# for linux/amd64 + linux/arm64 and pushes them to Docker Hub as one multi-arch
+# manifest list per tag.
+#
+# Architecture (per `image` in the matrix):
+#   1. `build` jobs run *per-platform on native runners* — amd64 on
+#      ubuntu-latest, arm64 on ubuntu-24.04-arm. Each pushes by digest only
+#      (no tag) and exports its sha256 as a tiny artifact. Native runners
+#      avoid the QEMU emulation tax that dominates arm64 build time.
+#   2. `merge` jobs (one per image) wait for both platforms, download the
+#      digests, and `docker buildx imagetools create` the tag list onto the
+#      per-arch digests as a single manifest list — no re-build, no re-push.
+#
+# Triggers:
+#   - push to main → publishes :latest, :main, :sha-<short>
+#   - push of a `v*` tag (e.g. v0.2.0) → :latest, :v0.2.0, :0.2.0, :0.2, :sha-<short>
+#   - manual workflow_dispatch → :manual-<run_id> + the usual branch/sha tags
+#   - PR against main (paths-filtered) → build-only smoke test, no push.
+#
+# Image names are ${DOCKERHUB_USERNAME}/hometable-backend and
+# ${DOCKERHUB_USERNAME}/hometable-frontend. Requires repo secrets
+# DOCKERHUB_USERNAME + DOCKERHUB_TOKEN.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+    paths:
+      # Only re-run the (slow) image build when something that actually
+      # affects an image changes. Keeps unrelated PRs cheap.
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/docker-publish.yml'
+  workflow_dispatch:
+    inputs:
+      push:
+        description: 'Push to Docker Hub (uncheck for build-only smoke test)'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  # One publish per ref at a time; cancel in-flight builds when main moves
+  # so we don't waste minutes on stale layers.
+  group: docker-publish-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Stage 1: per-platform build (native runners) ────────────────────
+  build:
+    name: build (${{ matrix.image }} / ${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Explicit `include` (not a cartesian product) so platform/runner
+        # stay paired and the YAML reads as a list of concrete jobs. Each
+        # image builds from its own directory as the context — the backend
+        # and frontend Dockerfiles COPY relative to their own folder.
+        include:
+          - image: hometable-backend
+            context: ./backend
+            dockerfile: ./backend/Dockerfile
+            platform: linux/amd64
+            runner: ubuntu-latest
+          - image: hometable-backend
+            context: ./backend
+            dockerfile: ./backend/Dockerfile
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm
+          - image: hometable-frontend
+            context: ./frontend
+            dockerfile: ./frontend/Dockerfile
+            platform: linux/amd64
+            runner: ubuntu-latest
+          - image: hometable-frontend
+            context: ./frontend
+            dockerfile: ./frontend/Dockerfile
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      # No QEMU — each job runs on a runner whose CPU matches its platform,
+      # so binfmt translation is unnecessary. That's the point of the split.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Resolve push flag
+        id: pushflag
+        run: |
+          # PR builds always smoke-test only — never push from an unmerged
+          # change. Manual dispatches honor the input toggle. Pushes to
+          # main / tags always publish.
+          case "${{ github.event_name }}" in
+            pull_request)       echo "push=false" >> "$GITHUB_OUTPUT" ;;
+            workflow_dispatch)  echo "push=${{ inputs.push }}" >> "$GITHUB_OUTPUT" ;;
+            *)                  echo "push=true"  >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Login to Docker Hub
+        if: steps.pushflag.outputs.push == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Only labels here — the per-platform build writes by digest with no
+      # tags. The `merge` job reads metadata again for the tagged manifest.
+      - name: Compute labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}
+          labels: |
+            org.opencontainers.image.title=${{ matrix.image }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      # Push runs: build one platform and push by digest. The
+      # `name-canonical=true,push-by-digest=true` outputs option puts the
+      # per-arch image into the registry under just its sha256 (no tag) so
+      # the merge step can stitch the final manifest list without rebuilding.
+      - name: Build and push by digest
+        id: build
+        if: steps.pushflag.outputs.push == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }},push-by-digest=true,name-canonical=true,push=true
+          # GHA cache scoped per (image, platform) so the two parallel jobs
+          # for one image don't race to overwrite each other's cache entry.
+          cache-from: type=gha,scope=${{ matrix.image }}-${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}-${{ matrix.platform }}
+          provenance: false
+
+      # PR / dispatch-without-push: just build the platform for a smoke test.
+      - name: Build (smoke test, no push)
+        if: steps.pushflag.outputs.push != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: false
+          cache-from: type=gha,scope=${{ matrix.image }}-${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}-${{ matrix.platform }}
+          provenance: false
+
+      # Persist each digest as a zero-byte file named after its sha so the
+      # merge job can collect them via download-artifact + merge-multiple.
+      - name: Export digest
+        if: steps.pushflag.outputs.push == 'true'
+        run: |
+          mkdir -p "${{ runner.temp }}/digests/${{ matrix.image }}"
+          digest='${{ steps.build.outputs.digest }}'
+          touch "${{ runner.temp }}/digests/${{ matrix.image }}/${digest#sha256:}"
+
+      - name: Upload digest
+        if: steps.pushflag.outputs.push == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          # Encode platform in the artifact name so the per-image merge job
+          # can pull all platforms with `pattern: digests-<image>-*`.
+          name: digests-${{ matrix.image }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+          path: ${{ runner.temp }}/digests/${{ matrix.image }}/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # ── Stage 2: assemble multi-arch manifest list ──────────────────────
+  # One merge job per image. Skipped on PRs / dispatch-without-push (those
+  # paths don't push or upload digests).
+  merge:
+    name: merge manifest (${{ matrix.image }})
+    needs: build
+    if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.push)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: hometable-backend
+          - image: hometable-frontend
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-${{ matrix.image }}-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=short,prefix=sha-
+            type=raw,value=manual-${{ github.run_id }},enable=${{ github.event_name == 'workflow_dispatch' }}
+
+      # Stitch the per-arch digests into one manifest list per tag. Every
+      # `-t TAG` becomes an alias of the same manifest list, so all tags
+      # resolve to the same digest.
+      - name: Create multi-arch manifest
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          # Word-splitting is intentional: imagetools wants one CLI arg per
+          # `-t TAG` and one per `<image>@<digest>` source.
+          # shellcheck disable=SC2046
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}@sha256:%s ' *)
+
+      - name: Inspect published image
+        run: |
+          docker buildx imagetools inspect \
+            "${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:${{ steps.meta.outputs.version }}"

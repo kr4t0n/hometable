@@ -110,6 +110,32 @@ object store handle range requests (video seeking) natively.
   `meal_recipes.recipe_id` FK `ON DELETE CASCADE`. Postgres enforces this; SQLite does not unless
   asked, so the test fixture (`conftest.py`) turns on `PRAGMA foreign_keys=ON` to match prod.
 
+## CI / CD (GitHub Actions)
+
+Three workflows in `.github/workflows/` (the latter two patterned on the sibling `argus` repo):
+
+- **`ci.yml`** — backend (`ruff` + `pytest`) and frontend (`eslint` + `tsc` + `vite build`) on
+  push to `main` and all PRs.
+- **`docker-publish.yml`** — multi-arch image build/publish. Two-stage: per-platform `build` jobs
+  run on **native runners** (amd64 on `ubuntu-latest`, arm64 on `ubuntu-24.04-arm`) and push *by
+  digest* with no tag (avoids the QEMU tax); per-image `merge` jobs then `docker buildx imagetools
+  create` the tag list onto those digests as one manifest list. Each image builds from its **own
+  directory as context** (`./backend`, `./frontend`) because the Dockerfiles COPY relative to their
+  folder. Publishes `kr4t0n/hometable-backend` and `kr4t0n/hometable-frontend`. PRs smoke-test
+  (build, no push). Needs secrets `DOCKERHUB_USERNAME` + `DOCKERHUB_TOKEN`.
+- **`helm-publish.yml`** — packages `deploy/helm/hometable` and pushes the `.tgz` + regenerated
+  `index.yaml` to the `gh-pages` branch (served at `https://kr4t0n.github.io/hometable/helm`).
+  Triggers on `main` pushes touching `deploy/helm/**`. **Self-bootstraps** the `gh-pages` branch on
+  first run (the `Checkout gh-pages` step is `continue-on-error`, then a bootstrap step inits an
+  orphan branch). `helm package` won't overwrite an existing `name-version`, so **bumping
+  `Chart.yaml`'s `version` is the release action**; `--merge` keeps older versions installable.
+
+**Release coupling (non-obvious):** the chart's image tag defaults to `.Chart.AppVersion` (see
+`_helpers.tpl`), but `docker-publish` only emits a `:X.Y.Z` image tag on a `vX.Y.Z` **git tag**.
+So a release is two steps that must agree: cut `vX.Y.Z` (builds the images) *and* set Chart.yaml's
+`version`/`appVersion` to `X.Y.Z` (so the published chart points at them). Bumping one without the
+other yields a chart that references a nonexistent image tag.
+
 ## Build phases
 
 1. Repo & tooling scaffold ✅

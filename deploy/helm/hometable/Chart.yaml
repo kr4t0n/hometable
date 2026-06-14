@@ -8,4 +8,6 @@ keywords:
   - recipes
   - fastapi
   - react
-home: https://github.com/your-org/hometable
+home: https://github.com/kr4t0n/hometable
+sources:
+  - https://github.com/kr4t0n/hometable

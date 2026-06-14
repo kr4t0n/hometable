@@ -4,11 +4,15 @@ nameOverride: ""
 fullnameOverride: ""
 
 image:
+  # Published to Docker Hub by .github/workflows/docker-publish.yml. Both
+  # images are tagged with the app version on `vX.Y.Z` releases, so the
+  # empty `tag` below resolves (via _helpers.tpl) to .Chart.AppVersion —
+  # keep Chart.yaml's appVersion in lockstep with the release tag.
   backend:
-    repository: hometable-backend
+    repository: kr4t0n/hometable-backend
     tag: "" # defaults to .Chart.AppVersion
   frontend:
-    repository: hometable-frontend
+    repository: kr4t0n/hometable-frontend
     tag: ""
   pullPolicy: IfNotPresent
 imagePullSecrets: []

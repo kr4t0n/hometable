@@ -1,0 +1,113 @@
+name: helm-publish
+
+# Publish the hometable Helm chart to a GitHub Pages-served repo at
+#   https://kr4t0n.github.io/hometable/helm/
+# (i.e. the `helm/` subfolder of the gh-pages branch).
+#
+# Trigger: any push to main that touches `deploy/helm/**` or this workflow.
+# Bumping `deploy/helm/hometable/Chart.yaml`'s `version:` is the natural
+# release action — `helm package` won't overwrite an existing tarball, so a
+# no-op merge with the same version is harmless and idempotent.
+#
+# Manual `workflow_dispatch` is also wired up for ad-hoc rebuilds / index
+# regeneration without a code change.
+#
+# First-run note: this workflow self-bootstraps the gh-pages branch if it
+# doesn't exist yet. After the first successful run, enable GitHub Pages in
+# repo Settings → Pages with source = gh-pages branch so the index is served.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deploy/helm/**'
+      - '.github/workflows/helm-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write # required to push commits to gh-pages
+
+concurrency:
+  # Serialize gh-pages publishers so concurrent runs don't race on git push.
+  # cancel-in-progress: false because each run finalizes an immutable,
+  # versioned .tgz we don't want to lose.
+  group: gh-pages-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.17.0
+
+      # Check out gh-pages into ./pages. continue-on-error so the very first
+      # run (before gh-pages exists) doesn't fail here — the next step
+      # bootstraps an empty branch in that case.
+      - name: Checkout gh-pages
+        id: pages
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: pages
+
+      - name: Bootstrap gh-pages if missing
+        if: steps.pages.outcome != 'success'
+        run: |
+          set -euo pipefail
+          echo "gh-pages branch not found — bootstrapping a fresh one"
+          rm -rf pages && mkdir pages && cd pages
+          git init -b gh-pages
+          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+
+      - name: Package & (re)index the chart under /helm
+        env:
+          # Pages URL the index advertises for chart downloads. Must match
+          # the live Pages URL exactly — tarball URLs in index.yaml are
+          # absolute, so a wrong base yields 404s at install time even though
+          # the .tgz is sitting right there.
+          REPO_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/helm
+        run: |
+          set -euo pipefail
+          mkdir -p pages/helm
+
+          # Package every chart under deploy/helm/. `helm package` refuses to
+          # overwrite a tarball of the same name-version — exactly the safety
+          # net we want: the only way to publish is to bump Chart.yaml's
+          # `version`.
+          helm package deploy/helm/hometable --destination pages/helm
+
+          # Rebuild index.yaml. `--merge` carries forward already-published
+          # versions, so users can still pin an older chart after a bump.
+          if [ -f pages/helm/index.yaml ]; then
+            helm repo index pages/helm --url "$REPO_URL" --merge pages/helm/index.yaml
+          else
+            helm repo index pages/helm --url "$REPO_URL"
+          fi
+
+          echo "Repo URL : $REPO_URL"
+          echo "Tarballs :"
+          ls -1 pages/helm/*.tgz || true
+
+      - name: Commit & push to gh-pages
+        working-directory: pages
+        run: |
+          set -euo pipefail
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add helm
+          # Skip the commit if nothing changed (e.g. the workflow ran but
+          # Chart.yaml's version wasn't bumped — the tarball already exists
+          # and `helm repo index --merge` produced byte-identical YAML).
+          if git diff --staged --quiet; then
+            echo "no chart changes — nothing to publish"
+            exit 0
+          fi
+          git commit -m "chore(helm): publish chart from ${GITHUB_SHA::7}"
+          git push origin HEAD:gh-pages
