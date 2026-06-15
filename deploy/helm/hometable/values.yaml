@@ -51,11 +51,14 @@ s3:
 
 ingress:
   enabled: true
-  className: ""
+  className: "" # e.g. "nginx", or "tailscale" for a Tailscale-operator ingress
   annotations: {}
-  host: hometable.example.com
+  host: hometable.example.com # for Tailscale, a short name like "hometable" → hometable.<tailnet>.ts.net
   tls:
     enabled: false
+    # secretName is OPTIONAL: cert-manager-style controllers need it (where the
+    # issued cert is stored); Tailscale provisions the cert itself, so leave it
+    # empty for a Tailscale ingress.
     secretName: ""
 
 serviceAccount:

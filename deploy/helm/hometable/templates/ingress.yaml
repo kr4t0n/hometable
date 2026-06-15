@@ -15,9 +15,14 @@ spec:
   {{- end }}
   {{- if .Values.ingress.tls.enabled }}
   tls:
+    # secretName is optional: cert-manager-style controllers need it (where the
+    # issued cert is stored), but Tailscale provisions the cert itself from the
+    # tls hosts and needs no secretName. Omit it for Tailscale.
     - hosts:
         - {{ .Values.ingress.host | quote }}
-      secretName: {{ required "ingress.tls.secretName is required when tls.enabled" .Values.ingress.tls.secretName }}
+      {{- with .Values.ingress.tls.secretName }}
+      secretName: {{ . }}
+      {{- end }}
   {{- end }}
   rules:
     # All traffic goes to the frontend, which serves the SPA and proxies /api
