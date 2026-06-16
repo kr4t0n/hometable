@@ -30,6 +30,23 @@ Postgres database and S3-compatible object store, not a third-party service.
     rename it, add/remove recipes, and reuse its shopping list any time. Full CRUD under
     `/api/v1/meals` (`GET` list, `POST`, `GET/PATCH/DELETE /{id}`, `GET /{id}/shopping-list`).
 
+## API & agent access
+
+The backend is a plain JSON API under `/api/v1` (recipes, tags, meals + per-recipe
+media). It's reachable wherever the app is — the frontend's nginx proxies `/api/` to
+the backend — so `https://<your-host>/api/v1/...` hits it directly. Interactive docs
+and the machine-readable schema are served under `/api` (so they're proxied too):
+
+- **Swagger UI:** `https://<your-host>/api/docs`
+- **OpenAPI spec:** `https://<your-host>/api/openapi.json`
+
+> The API has **no authentication** — access is gated only by network reachability
+> (e.g. a Tailscale tailnet). Don't expose the ingress publicly as-is.
+
+For automating recipe entry (e.g. an LLM agent recording recipes with photos/video),
+see **[`docs/agent-add-recipe.md`](docs/agent-add-recipe.md)** — a step-by-step
+playbook including the presigned direct-to-object-store media upload.
+
 ## Tech stack
 
 | Layer | Choice |

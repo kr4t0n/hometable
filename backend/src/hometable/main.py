@@ -20,7 +20,17 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="hometable API", version="0.1.0", lifespan=lifespan)
+# Docs/OpenAPI live under /api so they're reachable through the frontend's nginx,
+# which only proxies /api/* to the backend (the app root serves the SPA). This
+# lets an agent introspect the API at https://<host>/api/openapi.json.
+app = FastAPI(
+    title="hometable API",
+    version="0.2.0",
+    lifespan=lifespan,
+    openapi_url="/api/openapi.json",
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+)
 
 app.add_middleware(
     CORSMiddleware,

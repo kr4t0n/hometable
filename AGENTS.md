@@ -56,7 +56,10 @@ object store handle range requests (video seeking) natively.
 
 ## Module responsibilities (backend)
 
-- `main.py` — FastAPI app, CORS, router registration, `/healthz` + `/readyz`.
+- `main.py` — FastAPI app, CORS, router registration, `/healthz` + `/readyz`. **Docs/OpenAPI
+  are relocated under `/api`** (`/api/docs`, `/api/openapi.json`) so the frontend nginx — which
+  only proxies `/api/*` — exposes them; at the default root they'd be shadowed by the SPA. Agent
+  integration playbook lives in `docs/agent-add-recipe.md`.
 - `config.py` — settings from env (pydantic-settings).
 - `database.py` — SQLAlchemy engine/session.
 - `models.py` — ORM models: Recipe, Ingredient, Step, Media, Tag (+ join); Meal + MealRecipe
