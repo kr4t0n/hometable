@@ -56,11 +56,31 @@ DATABASE_URL
 {{- end -}}
 {{- end -}}
 
-{{/* S3 Secret name (existing or chart-managed). Keys: S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY */}}
+{{/* S3 Secret name (existing or chart-managed). Keys default to S3_ACCESS_KEY_ID /
+     S3_SECRET_ACCESS_KEY but can be overridden for an existing Secret. */}}
 {{- define "hometable.s3SecretName" -}}
 {{- if .Values.s3.existingSecret -}}
 {{- .Values.s3.existingSecret -}}
 {{- else -}}
 {{- printf "%s-s3" (include "hometable.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/* Key inside the S3 Secret holding the access key id. Overridable only for an
+     existing Secret; the chart-managed Secret always uses S3_ACCESS_KEY_ID. */}}
+{{- define "hometable.s3AccessKeyKey" -}}
+{{- if .Values.s3.existingSecret -}}
+{{- default "S3_ACCESS_KEY_ID" .Values.s3.existingSecretAccessKeyKey -}}
+{{- else -}}
+S3_ACCESS_KEY_ID
+{{- end -}}
+{{- end -}}
+
+{{/* Key inside the S3 Secret holding the secret access key. */}}
+{{- define "hometable.s3SecretKeyKey" -}}
+{{- if .Values.s3.existingSecret -}}
+{{- default "S3_SECRET_ACCESS_KEY" .Values.s3.existingSecretSecretKeyKey -}}
+{{- else -}}
+S3_SECRET_ACCESS_KEY
 {{- end -}}
 {{- end -}}

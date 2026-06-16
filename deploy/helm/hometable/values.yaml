@@ -45,7 +45,13 @@ s3:
   publicEndpoint: "" # browser-reachable, used to SIGN presigned URLs — e.g. https://minio.example.com
   bucket: hometable-media
   region: us-east-1
-  existingSecret: "" # Secret with keys S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY
+  existingSecret: "" # Secret holding the S3 credentials (keys below)
+  # Which keys inside existingSecret hold the credentials. Defaults match the
+  # chart-managed Secret; override to point at an existing Secret that uses
+  # different key names (e.g. S3_ACCESS_KEY / S3_SECRET_KEY). Ignored when
+  # existingSecret is empty (the chart-managed Secret always uses the defaults).
+  existingSecretAccessKeyKey: S3_ACCESS_KEY_ID
+  existingSecretSecretKeyKey: S3_SECRET_ACCESS_KEY
   accessKeyId: "" # used only if existingSecret is empty
   secretAccessKey: ""
 
