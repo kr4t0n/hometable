@@ -2,8 +2,26 @@ apiVersion: v1
 entries:
   hometable:
   - apiVersion: v2
+    appVersion: 0.3.0
+    created: "2026-06-20T08:25:34.545903819Z"
+    description: Self-hosted recipe menu book (FastAPI + React) — connects to EXTERNAL
+      Postgres + MinIO
+    digest: 20d744b38d40b3ae8a464768c9e495076934c6237815b00ffd88fd40b57e4334
+    home: https://github.com/kr4t0n/hometable
+    keywords:
+    - recipes
+    - fastapi
+    - react
+    name: hometable
+    sources:
+    - https://github.com/kr4t0n/hometable
+    type: application
+    urls:
+    - https://kr4t0n.github.io/hometable/helm/hometable-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: 0.2.0
-    created: "2026-06-16T15:56:23.516451804Z"
+    created: "2026-06-20T08:25:34.544480969Z"
     description: Self-hosted recipe menu book (FastAPI + React) — connects to EXTERNAL
       Postgres + MinIO
     digest: 27ed76da7927919e86ffc932a40744cb0890204f1e990f698e13ec7be3e32fb2
@@ -21,7 +39,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2026-06-16T15:56:23.51603983Z"
+    created: "2026-06-20T08:25:34.544058072Z"
     description: Self-hosted recipe menu book (FastAPI + React) — connects to EXTERNAL
       Postgres + MinIO
     digest: 5e2aeafa1d1d281c45633576aa397e03c2595361bf54e59e46018faadf514a55
@@ -39,7 +57,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2026-06-16T15:56:23.515582722Z"
+    created: "2026-06-20T08:25:34.543665833Z"
     description: Self-hosted recipe menu book (FastAPI + React) — connects to EXTERNAL
       Postgres + MinIO
     digest: a51e87b36adf8cc30de0d6233351e8dd103809f7314ef8e5b04d86c4804c46f5
@@ -57,7 +75,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2026-06-16T15:56:23.51517725Z"
+    created: "2026-06-20T08:25:34.543112102Z"
     description: Self-hosted recipe menu book (FastAPI + React) — connects to EXTERNAL
       Postgres + MinIO
     digest: 96f53476e836676c315f499de17cb923803b9d226fc67ee08c4b83ccc5e16ddf
@@ -73,4 +91,4 @@ entries:
     urls:
     - https://kr4t0n.github.io/hometable/helm/hometable-0.1.0.tgz
     version: 0.1.0
-generated: "2026-06-16T15:56:23.514579371Z"
+generated: "2026-06-20T08:25:34.542544346Z"
