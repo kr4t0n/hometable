@@ -86,7 +86,9 @@ object store handle range requests (video seeking) natively.
   a searchable popover (`components/AddRecipePicker.tsx`), not a native `<select>`. Check-off
   interactions (shopping list, recipe ingredients/steps) are deliberately ephemeral component
   state — nothing persists. Recipe detail is editorial: title/description/meta first, hero media
-  after. Print views rely on `print:hidden`; the global header/footer are hidden in `Layout`.
+  after — the hero prefers a video (uploaded clip or embed), falling back to the cover image, with
+  remaining media in a thumbnail grid below. Print views rely on `print:hidden`; the global
+  header/footer are hidden in `Layout`.
 
 ## Gotchas (non-obvious)
 

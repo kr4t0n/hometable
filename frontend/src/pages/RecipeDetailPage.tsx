@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ConfirmButton } from '@/components/ui/confirm-button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { api } from '@/lib/api'
+import { api, type Media } from '@/lib/api'
 import { scaleQuantity } from '@/lib/scale'
 import { cn } from '@/lib/utils'
 
@@ -73,7 +73,12 @@ export function RecipeDetailPage() {
   const baseServings = data.servings
   const current = servings ?? baseServings
   const factor = baseServings && current ? current / baseServings : 1
-  const hero = data.media.find((m) => m.id === data.cover_media_id) ?? data.media[0]
+  // Lead with motion: a video tells the story of a dish better than a still.
+  // Prefer a video for the hero (uploaded clip or embedded YouTube/Vimeo), and
+  // fall back to the cover image — then any remaining media — when there's none.
+  const isVideo = (m: Media) => m.media_type === 'video' || m.source === 'embed'
+  const cover = data.media.find((m) => m.id === data.cover_media_id) ?? data.media[0]
+  const hero = data.media.find(isVideo) ?? cover
   const rest = data.media.filter((m) => m.id !== hero?.id)
   const totalTime =
     data.prep_time_min || data.cook_time_min
