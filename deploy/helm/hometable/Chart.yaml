@@ -2,8 +2,8 @@ apiVersion: v2
 name: hometable
 description: Self-hosted recipe menu book (FastAPI + React) — connects to EXTERNAL Postgres + MinIO
 type: application
-version: 0.3.0
-appVersion: "0.3.0"
+version: 0.3.1
+appVersion: "0.3.1"
 keywords:
   - recipes
   - fastapi

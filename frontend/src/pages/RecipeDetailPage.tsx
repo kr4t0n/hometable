@@ -79,7 +79,10 @@ export function RecipeDetailPage() {
   const isVideo = (m: Media) => m.media_type === 'video' || m.source === 'embed'
   const cover = data.media.find((m) => m.id === data.cover_media_id) ?? data.media[0]
   const hero = data.media.find(isVideo) ?? cover
-  const rest = data.media.filter((m) => m.id !== hero?.id)
+  // When a video leads the page, the cover rides alongside the title as a still
+  // "poster"; when there's no video the cover IS the hero, so don't duplicate it.
+  const sideCover = hero && isVideo(hero) && cover && cover.id !== hero.id ? cover : null
+  const rest = data.media.filter((m) => m.id !== hero?.id && m.id !== sideCover?.id)
   const totalTime =
     data.prep_time_min || data.cook_time_min
       ? (data.prep_time_min ?? 0) + (data.cook_time_min ?? 0)
@@ -111,21 +114,33 @@ export function RecipeDetailPage() {
         </div>
       </div>
 
-      {/* Editorial order: name the dish before showing it. */}
+      {/* Editorial order: name the dish before showing it. With a video leading
+          the page below, the cover image rides beside the title as a still
+          poster; without a video it becomes the hero instead. */}
       <header className="space-y-4">
-        {data.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {data.tags.map((t) => (
-              <Badge key={t.id}>{t.name}</Badge>
-            ))}
+        <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-start">
+          <div className="space-y-4">
+            {data.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {data.tags.map((t) => (
+                  <Badge key={t.id}>{t.name}</Badge>
+                ))}
+              </div>
+            )}
+            <h1 className="text-display font-semibold text-balance">{data.title}</h1>
+            {data.description && (
+              <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
+                {data.description}
+              </p>
+            )}
           </div>
-        )}
-        <h1 className="text-display font-semibold text-balance">{data.title}</h1>
-        {data.description && (
-          <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            {data.description}
-          </p>
-        )}
+          {sideCover && (
+            <MediaPlayer
+              media={sideCover}
+              className="aspect-[4/3] w-40 rounded-xl shadow-card sm:w-56"
+            />
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-y py-3 text-sm">
           {totalTime != null && (
             <span className="num inline-flex items-center gap-2">
